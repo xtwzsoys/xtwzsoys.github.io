@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机矩阵按键知识卡片</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --primary-light: #6b8cbc;
+            --primary-dark: #2c4a7a;
+            --secondary: #ff9e4a;
+            --secondary-light: #ffb574;
+            --secondary-dark: #e68c3a;
+            --accent: #5cb85c;
+            --accent-light: #7dc97d;
+            --light: #f5f7fa;
+            --dark: #2c3e50;
+            --success: #5cb85c;
+            --danger: #d9534f;
+            --warning: #f0ad4e;
+            --info: #5bc0de;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            animation: fadeIn 1s ease-out;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--primary-light);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid var(--primary);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card:nth-child(2) {
+            border-top-color: var(--secondary);
+        }
+        
+        .card:nth-child(3) {
+            border-top-color: var(--accent);
+        }
+        
+        .card:nth-child(4) {
+            border-top-color: var(--info);
+        }
+        
+        .card:nth-child(5) {
+            border-top-color: var(--warning);
+        }
+        
+        .card:nth-child(6) {
+            border-top-color: var(--danger);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .card-icon {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .card:nth-child(2) .card-icon {
+            background: var(--secondary);
+        }
+        
+        .card:nth-child(3) .card-icon {
+            background: var(--accent);
+        }
+        
+        .card:nth-child(4) .card-icon {
+            background: var(--info);
+        }
+        
+        .card:nth-child(5) .card-icon {
+            background: var(--warning);
+        }
+        
+        .card:nth-child(6) .card-icon {
+            background: var(--danger);
+        }
+        
+        .card-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .card:nth-child(2) .card-title {
+            color: var(--secondary);
+        }
+        
+        .card:nth-child(3) .card-title {
+            color: var(--accent);
+        }
+        
+        .card:nth-child(4) .card-title {
+            color: var(--info);
+        }
+        
+        .card:nth-child(5) .card-title {
+            color: var(--warning);
+        }
+        
+        .card:nth-child(6) .card-title {
+            color: var(--danger);
+        }
+        
+        .card-content {
+            line-height: 1.6;
+            color: var(--dark);
+        }
+        
+        .card-content ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .card-content li {
+            margin-bottom: 8px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-content li:hover {
+            transform: translateX(5px);
+        }
+        
+        .card-content li::before {
+            content: '•';
+            color: var(--secondary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .card:nth-child(2) .card-content li::before {
+            color: var(--secondary);
+        }
+        
+        .card:nth-child(3) .card-content li::before {
+            color: var(--accent);
+        }
+        
+        .card:nth-child(4) .card-content li::before {
+            color: var(--info);
+        }
+        
+        .card:nth-child(5) .card-content li::before {
+            color: var(--warning);
+        }
+        
+        .card:nth-child(6) .card-content li::before {
+            color: var(--danger);
+        }
+        
+        .highlight {
+            background-color: rgba(255, 158, 74, 0.2);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 40px;
+            animation: fadeIn 1.5s ease-out;
+            border-top: 5px solid var(--secondary);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .demo-section.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .demo-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .demo-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .matrix-demo {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        
+        .matrix-row {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .matrix-key {
+            width: 60px;
+            height: 60px;
+            margin: 8px;
+            background: var(--light);
+            border: 2px solid var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .matrix-key:hover {
+            background: #e8ecf5;
+            transform: translateY(-3px);
+        }
+        
+        .matrix-key.active {
+            background: var(--secondary);
+            color: white;
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(255, 158, 74, 0.7);
+            border-color: var(--secondary-dark);
+            animation: pulse 0.5s infinite alternate;
+        }
+        
+        .key-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        
+        .port-status {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .port-status h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+        
+        .port-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .port-group {
+            margin-bottom: 20px;
+        }
+        
+        .port-group h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .port-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .port-item.active {
+            transform: scale(1.03);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .port-name {
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .port-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .port-high {
+            background: rgba(92, 184, 92, 0.2);
+            color: var(--success);
+        }
+        
+        .port-low {
+            background: rgba(217, 83, 79, 0.2);
+            color: var(--danger);
+        }
+        
+        .code-section {
+            margin-top: 30px;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+            line-height: 1.5;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .code-title {
+            color: #ecf0f1;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .code-language {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .code-line {
+            padding: 2px 0;
+            transition: background 0.3s;
+        }
+        
+        .code-line.highlight {
+            background: rgba(255, 158, 74, 0.3);
+            border-left: 3px solid var(--secondary);
+            padding-left: 10px;
+        }
+        
+        .code-comment {
+            color: #7f8c8d;
+        }
+        
+        .code-keyword {
+            color: #e74c3c;
+        }
+        
+        .code-function {
+            color: #3498db;
+        }
+        
+        .code-var {
+            color: #9b59b6;
+        }
+        
+        .code-number {
+            color: #2ecc71;
+        }
+        
+        .tip-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 4px solid var(--info);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .tip-box i {
+            color: var(--info);
+            margin-right: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 15px rgba(255, 158, 74, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 158, 74, 0.9); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .matrix-key {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .demo-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-keyboard bounce"></i> 51单片机矩阵按键知识卡片</h1>
+            <p class="subtitle">专为零基础小白设计的矩阵按键入门指南，通过直观的动画演示和通俗易懂的讲解，带你快速掌握单片机矩阵按键的核心原理与应用</p>
+        </header>
+        
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-th"></i></div>
+                    <h2 class="card-title">矩阵按键概念</h2>
+                </div>
+                <div class="card-content">
+                    <p>矩阵按键是一种将多个按键排列成矩阵形式的电路设计，通过行列交叉的方式减少I/O口的占用。</p>
+                    <p><span class="highlight">核心优势</span>：使用4×4矩阵按键只需要8个I/O口就能实现16个按键功能，比独立按键节省一半资源！</p>
+                    <p>这种设计大大节省了宝贵的单片机I/O资源，是嵌入式系统中常用的按键扩展方法。</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <h2 class="card-title">矩阵按键优势</h2>
+                </div>
+                <div class="card-content">
+                    <ul>
+                        <li><span class="highlight">节省I/O资源</span>：大大减少单片机I/O口的占用</li>
+                        <li><span class="highlight">扩展性强</span>：可以轻松扩展更多按键</li>
+                        <li><span class="highlight">成本低</span>：硬件结构简单，成本较低</li>
+                        <li><span class="highlight">布局灵活</span>：可根据需求设计不同规模的矩阵</li>
+                        <li><span class="highlight">易于维护</span>：故障排查相对简单</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-cogs"></i></div>
+                    <h2 class="card-title">工作原理</h2>
+                </div>
+                <div class="card-content">
+                    <p>矩阵按键采用<span class="highlight">行列扫描法</span>来检测按键状态：</p>
+                    <ul>
+                        <li>将行线设置为输出，列线设置为输入</li>
+                        <li>逐行输出低电平，其他行保持高电平</li>
+                        <li>检查列线输入状态，确定被按下的按键位置</li>
+                        <li>通过行列坐标确定具体按键</li>
+                        <li>使用软件消抖处理按键抖动问题</li>
+                    </ul>
+                    <p>这种方法通过循环扫描，可以检测矩阵中任意一个按键的按下状态。</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-plug"></i></div>
+                    <h2 class="card-title">硬件连接</h2>
+                </div>
+                <div class="card-content">
+                    <p>以4×4矩阵按键为例：</p>
+                    <ul>
+                        <li>4根行线连接到单片机的4个I/O口（设置为输出）</li>
+                        <li>4根列线连接到单片机的4个I/O口（设置为输入）</li>
+                        <li>每个按键位于行线和列线的交叉点</li>
+                        <li>行线和列线之间通过上拉电阻连接到VCC</li>
+                        <li>按键未按下时，列线通过上拉电阻保持高电平</li>
+                        <li>按键按下时，对应的行线和列线导通</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-code"></i></div>
+                    <h2 class="card-title">软件实现</h2>
+                </div>
+                <div class="card-content">
+                    <p>矩阵按键检测的核心算法：</p>
+                    <ul>
+                        <li>初始化：设置行线为输出，列线为输入</li>
+                        <li>扫描循环：逐行输出低电平</li>
+                        <li>检测列线：读取列线状态，判断哪一列为低电平</li>
+                        <li>消抖处理：检测到按键后延时10-20ms再次检测</li>
+                        <li>键值映射：根据行列位置转换为具体键值</li>
+                        <li>释放检测：等待按键释放后再执行相应操作</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h2 class="card-title">常见问题</h2>
+                </div>
+                <div class="card-content">
+                    <ul>
+                        <li><span class="highlight">按键抖动</span>：机械开关在闭合/断开时会产生抖动，需要通过软件消抖</li>
+                        <li><span class="highlight">多键同时按下</span>：需要特殊处理，一般采用"N键滚动"或"N键锁定"方式</li>
+                        <li><span class="highlight">扫描频率</span>：扫描频率不能太高也不能太低，一般10-50ms扫描一次</li>
+                        <li><span class="highlight">功耗问题</span>：在低功耗应用中需要注意扫描策略</li>
+                        <li><span class="highlight">硬件冲突</span>：确保I/O口配置正确，避免硬件冲突</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">矩阵按键交互演示</h2>
+            <p style="text-align: center; margin-bottom: 20px;">点击或长按下面的按键，观察端口电平变化和对应的代码执行</p>
+            
+            <div class="tip-box">
+                <i class="fas fa-lightbulb"></i>
+                <strong>提示：</strong> 长按按键可以保持按键状态，方便观察端口电平变化和代码执行过程。
+            </div>
+            
+            <div class="demo-content">
+                <div class="matrix-demo">
+                    <div class="matrix-row">
+                        <div class="matrix-key" data-row="0" data-col="0">
+                            <span class="key-label">R0,C0</span>
+                            1
+                        </div>
+                        <div class="matrix-key" data-row="0" data-col="1">
+                            <span class="key-label">R0,C1</span>
+                            2
+                        </div>
+                        <div class="matrix-key" data-row="0" data-col="2">
+                            <span class="key-label">R0,C2</span>
+                            3
+                        </div>
+                        <div class="matrix-key" data-row="0" data-col="3">
+                            <span class="key-label">R0,C3</span>
+                            A
+                        </div>
+                    </div>
+                    <div class="matrix-row">
+                        <div class="matrix-key" data-row="1" data-col="0">
+                            <span class="key-label">R1,C0</span>
+                            4
+                        </div>
+                        <div class="matrix-key" data-row="1" data-col="1">
+                            <span class="key-label">R1,C1</span>
+                            5
+                        </div>
+                        <div class="matrix-key" data-row="1" data-col="2">
+                            <span class="key-label">R1,C2</span>
+                            6
+                        </div>
+                        <div class="matrix-key" data-row="1" data-col="3">
+                            <span class="key-label">R1,C3</span>
+                            B
+                        </div>
+                    </div>
+                    <div class="matrix-row">
+                        <div class="matrix-key" data-row="2" data-col="0">
+                            <span class="key-label">R2,C0</span>
+                            7
+                        </div>
+                        <div class="matrix-key" data-row="2" data-col="1">
+                            <span class="key-label">R2,C1</span>
+                            8
+                        </div>
+                        <div class="matrix-key" data-row="2" data-col="2">
+                            <span class="key-label">R2,C2</span>
+                            9
+                        </div>
+                        <div class="matrix-key" data-row="2" data-col="3">
+                            <span class="key-label">R2,C3</span>
+                            C
+                        </div>
+                    </div>
+                    <div class="matrix-row">
+                        <div class="matrix-key" data-row="3" data-col="0">
+                            <span class="key-label">R3,C0</span>
+                            *
+                        </div>
+                        <div class="matrix-key" data-row="3" data-col="1">
+                            <span class="key-label">R3,C1</span>
+                            0
+                        </div>
+                        <div class="matrix-key" data-row="3" data-col="2">
+                            <span class="key-label">R3,C2</span>
+                            #
+                        </div>
+                        <div class="matrix-key" data-row="3" data-col="3">
+                            <span class="key-label">R3,C3</span>
+                            D
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="port-status">
+                    <h3>端口状态</h3>
+                    <div class="port-grid">
+                        <div class="port-group">
+                            <h4>行线 (输出)</h4>
+                            <div class="port-item">
+                                <span class="port-name">ROW1 (P1.0)</span>
+                                <span class="port-value port-high" id="row0">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">ROW2 (P1.1)</span>
+                                <span class="port-value port-high" id="row1">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">ROW3 (P1.2)</span>
+                                <span class="port-value port-high" id="row2">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">ROW4 (P1.3)</span>
+                                <span class="port-value port-high" id="row3">高电平</span>
+                            </div>
+                        </div>
+                        
+                        <div class="port-group">
+                            <h4>列线 (输入)</h4>
+                            <div class="port-item">
+                                <span class="port-name">COL1 (P1.4)</span>
+                                <span class="port-value port-high" id="col0">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">COL2 (P1.5)</span>
+                                <span class="port-value port-high" id="col1">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">COL3 (P1.6)</span>
+                                <span class="port-value port-high" id="col2">高电平</span>
+                            </div>
+                            <div class="port-item">
+                                <span class="port-name">COL4 (P1.7)</span>
+                                <span class="port-value port-high" id="col3">高电平</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="key-info" style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <p style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">当前按键:</p>
+                        <p style="color: var(--dark);">未按下任何按键</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-section">
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-title">矩阵按键扫描代码示例</div>
+                        <div class="code-language">C语言</div>
+                    </div>
+                    <pre><code class="code-line"><span class="code-comment">// 51单片机矩阵按键扫描示例</span>
+<span class="code-line"><span class="code-keyword">#include</span> &lt;reg51.h&gt;</span>
+<span class="code-line"></span>
+<span class="code-line"><span class="code-comment">// 定义行线和列线</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">ROW1</span> = P1^0;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">ROW2</span> = P1^1;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">ROW3</span> = P1^2;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">ROW4</span> = P1^3;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">COL1</span> = P1^4;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">COL2</span> = P1^5;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">COL3</span> = P1^6;</span>
+<span class="code-line"><span class="code-keyword">sbit</span> <span class="code-var">COL4</span> = P1^7;</span>
+<span class="code-line"></span>
+<span class="code-line"><span class="code-comment">// 按键扫描函数</span>
+<span class="code-keyword">unsigned char</span> <span class="code-function">KeyScan</span>() {</span>
+<span class="code-line">    <span class="code-keyword">unsigned char</span> <span class="code-var">key_value</span> = <span class="code-number">0</span>;</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 扫描第一行</span>
+<span class="code-line">    <span class="code-var">ROW1</span> = <span class="code-number">0</span>; <span class="code-var">ROW2</span> = <span class="code-number">1</span>; <span class="code-var">ROW3</span> = <span class="code-number">1</span>; <span class="code-var">ROW4</span> = <span class="code-number">1</span>;</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">1</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">2</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">3</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">4</span>; }</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 扫描第二行</span>
+<span class="code-line">    <span class="code-var">ROW1</span> = <span class="code-number">1</span>; <span class="code-var">ROW2</span> = <span class="code-number">0</span>; <span class="code-var">ROW3</span> = <span class="code-number">1</span>; <span class="code-var">ROW4</span> = <span class="code-number">1</span>;</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">5</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">6</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">7</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">8</span>; }</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 扫描第三行</span>
+<span class="code-line">    <span class="code-var">ROW1</span> = <span class="code-number">1</span>; <span class="code-var">ROW2</span> = <span class="code-number">1</span>; <span class="code-var">ROW3</span> = <span class="code-number">0</span>; <span class="code-var">ROW4</span> = <span class="code-number">1</span>;</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">9</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">10</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">11</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">12</span>; }</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-comment">// 扫描第四行</span>
+<span class="code-line">    <span class="code-var">ROW1</span> = <span class="code-number">1</span>; <span class="code-var">ROW2</span> = <span class="code-number">1</span>; <span class="code-var">ROW3</span> = <span class="code-number">1</span>; <span class="code-var">ROW4</span> = <span class="code-number">0</span>;</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL1</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">13</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL2</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">14</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL3</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">15</span>; }</span>
+<span class="code-line">    <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) { <span class="code-function">DelayMs</span>(<span class="code-number">10</span>); <span class="code-keyword">if</span> (<span class="code-var">COL4</span> == <span class="code-number">0</span>) <span class="code-var">key_value</span> = <span class="code-number">16</span>; }</span>
+<span class="code-line">    </span>
+<span class="code-line">    <span class="code-keyword">return</span> <span class="code-var">key_value</span>;</span>
+<span class="code-line">}</span>
+<span class="code-line"></span>
+<span class="code-line"><span class="code-comment">// 延时函数</span>
+<span class="code-keyword">void</span> <span class="code-function">DelayMs</span>(<span class="code-keyword">unsigned int</span> <span class="code-var">ms</span>) {</span>
+<span class="code-line">    <span class="code-keyword">unsigned int</span> <span class="code-var">i</span>, <span class="code-var">j</span>;</span>
+<span class="code-line">    <span class="code-keyword">for</span>(<span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> &lt; <span class="code-var">ms</span>; <span class="code-var">i</span>++)</span>
+<span class="code-line">        <span class="code-keyword">for</span>(<span class="code-var">j</span> = <span class="code-number">0</span>; <span class="code-var">j</span> &lt; <span class="code-number">123</span>; <span class="code-var">j</span>++);</span>
+<span class="code-line">}</span></code></pre>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 51单片机矩阵按键知识卡片 | 专为零基础学习者设计</p>
+            <p style="margin-top: 10px;">通过直观演示和通俗讲解，帮助您快速掌握单片机矩阵按键的核心原理与应用</p>
+        </footer>
+    </div>
+
+    <script>
+        // 矩阵按键交互演示
+        document.addEventListener('DOMContentLoaded', function() {
+            const keys = document.querySelectorAll('.matrix-key');
+            const rows = document.querySelectorAll('.port-item .port-value[id^="row"]');
+            const cols = document.querySelectorAll('.port-item .port-value[id^="col"]');
+            const keyInfo = document.getElementById('key-info');
+            const codeLines = document.querySelectorAll('.code-line');
+            const portItems = document.querySelectorAll('.port-item');
+            
+            let longPressTimer;
+            let isLongPress = false;
+            
+            // 初始化端口状态显示
+            function resetPortStatus() {
+                rows.forEach(row => {
+                    row.textContent = '高电平';
+                    row.className = 'port-value port-high';
+                });
+                
+                cols.forEach(col => {
+                    col.textContent = '高电平';
+                    col.className = 'port-value port-high';
+                });
+                
+                keyInfo.innerHTML = `
+                    <p style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">当前按键:</p>
+                    <p style="color: var(--dark);">未按下任何按键</p>
+                `;
+                
+                // 移除代码高亮
+                codeLines.forEach(line => line.classList.remove('highlight'));
+                
+                // 移除端口激活状态
+                portItems.forEach(item => item.classList.remove('active'));
+            }
+            
+            // 按键按下事件
+            function handleKeyDown(key) {
+                // 移除其他按键的激活状态
+                keys.forEach(k => k.classList.remove('active'));
+                
+                // 设置当前按键为激活状态
+                key.classList.add('active');
+                
+                const row = parseInt(key.getAttribute('data-row'));
+                const col = parseInt(key.getAttribute('data-col'));
+                const keyText = key.textContent.trim();
+                
+                // 更新端口状态显示
+                resetPortStatus();
+                
+                // 设置当前行的电平状态
+                rows[row].textContent = '低电平';
+                rows[row].className = 'port-value port-low';
+                rows[row].closest('.port-item').classList.add('active');
+                
+                // 设置当前列的电平状态
+                cols[col].textContent = '低电平';
+                cols[col].className = 'port-value port-low';
+                cols[col].closest('.port-item').classList.add('active');
+                
+                // 更新按键信息
+                keyInfo.innerHTML = `
+                    <p style="font-weight: bold; color: var(--primary); margin-bottom: 5px;">当前按键:</p>
+                    <p style="color: var(--dark);">按键 ${keyText} (行${row+1}, 列${col+1})</p>
+                    <p style="color: var(--dark); margin-top: 5px;">对应的I/O端口: ROW${row+1} (P1.${row}) 和 COL${col+1} (P1.${col+4})</p>
+                    ${isLongPress ? '<p style="color: var(--secondary); margin-top: 5px;"><i class="fas fa-hourglass-half"></i> 长按模式</p>' : ''}
+                `;
+                
+                // 高亮对应的代码行
+                codeLines.forEach(line => line.classList.remove('highlight'));
+                
+                // 根据按键位置高亮对应的代码行
+                let lineIndex = 0;
+                if (row === 0) {
+                    lineIndex = 14 + col; // 第一行扫描的代码
+                } else if (row === 1) {
+                    lineIndex = 20 + col; // 第二行扫描的代码
+                } else if (row === 2) {
+                    lineIndex = 26 + col; // 第三行扫描的代码
+                } else if (row === 3) {
+                    lineIndex = 32 + col; // 第四行扫描的代码
+                }
+                
+                if (lineIndex < codeLines.length) {
+                    codeLines[lineIndex].classList.add('highlight');
+                }
+            }
+            
+            // 按键点击事件
+            keys.forEach(key => {
+                key.addEventListener('mousedown', function() {
+                    isLongPress = false;
+                    
+                    // 设置长按计时器
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        handleKeyDown(this);
+                    }, 500); // 500ms后触发长按
+                    
+                    handleKeyDown(this);
+                });
+                
+                key.addEventListener('mouseup', function() {
+                    clearTimeout(longPressTimer);
+                    this.classList.remove('active');
+                    resetPortStatus();
+                });
+                
+                key.addEventListener('mouseleave', function() {
+                    clearTimeout(longPressTimer);
+                    this.classList.remove('active');
+                    if (!isLongPress) {
+                        resetPortStatus();
+                    }
+                });
+                
+                // 触摸设备支持
+                key.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    isLongPress = false;
+                    
+                    // 设置长按计时器
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        handleKeyDown(this);
+                    }, 500); // 500ms后触发长按
+                    
+                    handleKeyDown(this);
+                });
+                
+                key.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    clearTimeout(longPressTimer);
+                    this.classList.remove('active');
+                    resetPortStatus();
+                });
+            });
+            
+            // 卡片动画
+            function animateCards() {
+                const cards = document.querySelectorAll('.card, .demo-section');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('animate');
+                    }, index * 200);
+                });
+            }
+            
+            // 初始化
+            resetPortStatus();
+            animateCards();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机中断系统知识卡片</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #ff9e00;
+            --info: #4895ef;
+            --card-1: #4361ee;
+            --card-2: #3a0ca3;
+            --card-3: #f72585;
+            --card-4: #4cc9f0;
+            --card-5: #4895ef;
+            --card-6: #7209b7;
+            --card-7: #ff9e00;
+            --card-8: #06d6a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--card-1), var(--card-2), var(--card-3), var(--card-4), var(--card-5));
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: var(--dark);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--card-color, var(--primary));
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--card-color, var(--primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: var(--card-color, var(--primary));
+            font-size: 1.5rem;
+            flex: 1;
+        }
+        
+        .card-content {
+            line-height: 1.5;
+        }
+        
+        .card-content p {
+            margin-bottom: 12px;
+        }
+        
+        .card-content ul {
+            margin-left: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .card-content li {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 8px;
+        }
+        
+        .card-content li::before {
+            content: "•";
+            color: var(--card-color, var(--primary));
+            font-weight: bold;
+            position: absolute;
+            left: -10px;
+        }
+        
+        .highlight {
+            background-color: rgba(67, 97, 238, 0.15);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: var(--card-color, var(--primary));
+        }
+        
+        .demo {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-left: 3px solid var(--card-color, var(--primary));
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .demo h3 {
+            color: var(--card-color, var(--primary));
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        
+        .demo h3 i {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .code-comment {
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .interrupt-source {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0;
+        }
+        
+        .source-item {
+            background: var(--light);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .source-item i {
+            margin-right: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .system-diagram {
+            width: 100%;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .diagram-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .diagram-box {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            flex: 1;
+            margin: 0 8px;
+            border: 2px solid var(--card-color, var(--primary));
+        }
+        
+        .diagram-box h4 {
+            color: var(--card-color, var(--primary));
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .diagram-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            font-size: 1.3rem;
+            color: var(--card-color, var(--primary));
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .flow-step {
+            background: var(--light);
+            padding: 10px 16px;
+            border-radius: 20px;
+            margin: 6px 0;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .flow-step:hover {
+            transform: scale(1.02);
+        }
+        
+        .flow-step:nth-child(odd) {
+            background: var(--card-color, var(--primary));
+            color: white;
+        }
+        
+        .flow-arrow {
+            font-size: 1.3rem;
+            color: var(--card-color, var(--primary));
+            margin: 4px 0;
+        }
+        
+        .application-case {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--info);
+            transition: all 0.3s;
+        }
+        
+        .application-case:hover {
+            transform: translateX(3px);
+        }
+        
+        .application-case h4 {
+            color: var(--info);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+        
+        .application-case h4::before {
+            content: "💡";
+            margin-right: 6px;
+            font-size: 1rem;
+        }
+        
+        .card-footer {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-tag {
+            background: var(--card-color, var(--primary));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .card-number {
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        /* 串行口中断卡片特殊布局 */
+        .uart-card-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .uart-card-layout .demo {
+            margin: 0;
+        }
+        
+        .interrupt-demo-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: 30px auto;
+            max-width: 1000px;
+            text-align: center;
+        }
+        
+        .interrupt-demo-container h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+        
+        .demo-btn.int0 { background: var(--card-1); }
+        .demo-btn.t0 { background: var(--card-3); }
+        .demo-btn.int1 { background: var(--card-4); }
+        .demo-btn.t1 { background: var(--card-5); }
+        .demo-btn.uart { background: var(--card-6); }
+        
+        .demo-visualization {
+            height: 200px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+        }
+        
+        .demo-cpu {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: var(--primary);
+            border-radius: 50%;
+            top: 65px;
+            left: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 2;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+            transition: all 0.5s;
+            font-size: 0.9rem;
+        }
+        
+        .demo-program-flow {
+            position: absolute;
+            width: 270px;
+            height: 12px;
+            background: var(--success);
+            top: 95px;
+            left: 170px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .demo-interrupt-line {
+            position: absolute;
+            width: 12px;
+            height: 0;
+            background: var(--accent);
+            border-radius: 6px;
+            transform-origin: top;
+            transition: height 0.5s;
+        }
+        
+        .demo-interrupt-line.int0 { left: 230px; top: 35px; }
+        .demo-interrupt-line.t0 { left: 320px; top: 35px; }
+        .demo-interrupt-line.int1 { left: 410px; top: 35px; }
+        .demo-interrupt-line.t1 { left: 500px; top: 35px; }
+        .demo-interrupt-line.uart { left: 590px; top: 35px; }
+        
+        .demo-interrupt-source {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .demo-interrupt-source.int0 { 
+            background: var(--card-1);
+            top: 15px;
+            left: 210px;
+        }
+        .demo-interrupt-source.t0 { 
+            background: var(--card-3);
+            top: 15px;
+            left: 300px;
+        }
+        .demo-interrupt-source.int1 { 
+            background: var(--card-4);
+            top: 15px;
+            left: 390px;
+        }
+        .demo-interrupt-source.t1 { 
+            background: var(--card-5);
+            top: 15px;
+            left: 480px;
+        }
+        .demo-interrupt-source.uart { 
+            background: var(--card-6);
+            top: 15px;
+            left: 570px;
+        }
+        
+        .demo-interrupt-source.active {
+            animation: pulse 0.5s infinite;
+        }
+        
+        .demo-status {
+            margin-top: 12px;
+            font-weight: 500;
+            min-height: 20px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .demo-step {
+            display: none;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .demo-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--dark);
+            font-size: 0.85rem;
+            opacity: 0.7;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .demo-btn {
+                width: 180px;
+            }
+            
+            .diagram-row {
+                flex-direction: column;
+            }
+            
+            .diagram-box {
+                margin: 8px 0;
+            }
+            
+            .demo-visualization {
+                height: 250px;
+            }
+            
+            .demo-interrupt-source {
+                transform: scale(0.8);
+            }
+            
+            .demo-interrupt-source.int0 { left: 160px; }
+            .demo-interrupt-source.t0 { left: 220px; }
+            .demo-interrupt-source.int1 { left: 280px; }
+            .demo-interrupt-source.t1 { left: 340px; }
+            .demo-interrupt-source.uart { left: 400px; }
+            
+            .demo-interrupt-line.int0 { left: 180px; }
+            .demo-interrupt-line.t0 { left: 240px; }
+            .demo-interrupt-line.int1 { left: 300px; }
+            .demo-interrupt-line.t1 { left: 360px; }
+            .demo-interrupt-line.uart { left: 420px; }
+            
+            /* 移动端串行口中断卡片布局 */
+            .uart-card-layout {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>51单片机中断系统知识卡片</h1>
+        <p>通俗易懂地理解单片机如何"分身有术"，同时处理多个任务。每个卡片聚焦一个核心概念，配有应用场景和编程示例。</p>
+    </div>
+    
+    <div class="cards-container">
+        <!-- 卡片1：什么是中断 -->
+        <div class="card visible" style="--card-color: var(--card-1)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h2>什么是中断？</h2>
+            </div>
+            <div class="card-content">
+                <p>想象一下你在看书时，手机突然响了——你会先做个<span class="highlight">书签标记</span>当前阅读位置，然后去接电话，接完电话再回到书签处继续阅读。</p>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-lightbulb"></i> 中断的本质</h3>
+                    <p>单片机的中断系统也是类似的机制：</p>
+                    <ul>
+                        <li>CPU正在执行<span class="highlight">主程序</span></li>
+                        <li>突然有<span class="highlight">紧急事件</span>发生（中断请求）</li>
+                        <li>CPU暂停当前工作，保存现场</li>
+                        <li>转去处理<span class="highlight">中断服务程序</span></li>
+                        <li>处理完成后，恢复现场，继续执行主程序</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">核心概念</div>
+                <div class="card-number">01</div>
+            </div>
+        </div>
+        
+        <!-- 卡片2：中断源 -->
+        <div class="card visible" style="--card-color: var(--card-2)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h2>中断源 - 谁能打断CPU？</h2>
+            </div>
+            <div class="card-content">
+                <p>AT89C51有<span class="highlight">5个中断源</span>，它们可以在特定条件下打断CPU的正常工作：</p>
+                
+                <div class="interrupt-source">
+                    <div class="source-item" style="background-color: var(--card-1); color: white;">
+                        <i class="fas fa-signal"></i> 外部中断0 (INT0)
+                    </div>
+                    <div class="source-item" style="background-color: var(--card-3); color: white;">
+                        <i class="fas fa-clock"></i> 定时器0 (T0)
+                    </div>
+                    <div class="source-item" style="background-color: var(--card-4); color: white;">
+                        <i class="fas fa-signal"></i> 外部中断1 (INT1)
+                    </div>
+                    <div class="source-item" style="background-color: var(--card-5); color: white;">
+                        <i class="fas fa-clock"></i> 定时器1 (T1)
+                    </div>
+                    <div class="source-item" style="background-color: var(--card-6); color: white;">
+                        <i class="fas fa-exchange-alt"></i> 串行口中断 (RI/TI)
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-lightbulb"></i> 生活中的例子</h3>
+                    <p><strong>外部中断</strong>：就像门铃响了，你需要立即去开门</p>
+                    <p><strong>定时器中断</strong>：就像闹钟响了，提醒你该做某事了</p>
+                    <p><strong>串口中断</strong>：就像收到短信，需要立即查看</p>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">基础知识</div>
+                <div class="card-number">02</div>
+            </div>
+        </div>
+        
+        <!-- 卡片3：中断系统构成 -->
+        <div class="card visible" style="--card-color: var(--card-3)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h2>中断系统构成</h2>
+            </div>
+            <div class="card-content">
+                <p>51单片机的中断系统由以下几个关键部分组成：</p>
+                
+                <div class="system-diagram">
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <h4>中断源</h4>
+                            <p>产生中断请求的信号源</p>
+                            <p>INT0, T0, INT1, T1, 串口(RI/TI)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="diagram-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <h4>中断控制</h4>
+                            <p>通过IE寄存器控制中断的开启与关闭</p>
+                        </div>
+                    </div>
+                    
+                    <div class="diagram-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <h4>优先级管理</h4>
+                            <p>通过IP寄存器设置中断优先级</p>
+                        </div>
+                    </div>
+                    
+                    <div class="diagram-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <h4>中断响应</h4>
+                            <p>CPU自动跳转到中断服务程序</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-microchip"></i> 关键控制寄存器</h3>
+                    <ul>
+                        <li><span class="highlight">TCON</span>：定时器/中断控制寄存器</li>
+                        <li><span class="highlight">IE</span>：中断允许寄存器</li>
+                        <li><span class="highlight">IP</span>：中断优先级寄存器</li>
+                        <li><span class="highlight">SCON</span>：串口控制寄存器</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">系统架构</div>
+                <div class="card-number">03</div>
+            </div>
+        </div>
+        
+        <!-- 卡片4：中断处理流程 -->
+        <div class="card visible" style="--card-color: var(--card-4)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h2>中断处理流程</h2>
+            </div>
+            <div class="card-content">
+                <p>当中断发生时，单片机会按照以下步骤处理：</p>
+                
+                <div class="flow-container">
+                    <div class="flow-step">CPU执行主程序</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">中断源发出中断请求</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">CPU完成当前指令</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">保护现场(压栈)</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">跳转到中断服务程序</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">执行中断处理代码</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">恢复现场(出栈)</div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-step">返回主程序继续执行</div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-desktop"></i> 直观例子：按钮控制LED</h3>
+                    <p><strong>主程序</strong>：LED闪烁</p>
+                    <p><strong>中断</strong>：按钮按下时改变LED状态</p>
+                    <p>当按钮按下时，无论LED处于什么状态，都会立即响应中断，改变LED模式，然后继续原来的闪烁程序。</p>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">工作流程</div>
+                <div class="card-number">04</div>
+            </div>
+        </div>
+        
+        <!-- 卡片5：外部中断0应用 -->
+        <div class="card visible" style="--card-color: var(--card-5)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-signal"></i>
+                </div>
+                <h2>外部中断0应用</h2>
+            </div>
+            <div class="card-content">
+                <div class="application-case">
+                    <h4>应用场景：紧急停止按钮</h4>
+                    <p>当机器运行中出现异常时，按下紧急停止按钮，通过INT0立即停止所有操作，确保安全。</p>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-code"></i> 中断服务函数</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 外部中断0服务函数 - 中断号0</span><br>
+                        void INT0_ISR() interrupt 0 {<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 紧急停止处理</span><br>
+                        &nbsp;&nbsp;stop_flag = 1;&nbsp;&nbsp;<span class="code-comment">// 设置停止标志</span><br>
+                        &nbsp;&nbsp;motor_off();&nbsp;&nbsp;<span class="code-comment">// 关闭电机</span><br>
+                        &nbsp;&nbsp;alarm_on();&nbsp;&nbsp;<span class="code-comment">// 打开报警</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 注意：外部中断标志硬件自动清除</span><br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-cogs"></i> 初始化代码</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 初始化外部中断0</span><br>
+                        void init_INT0() {<br>
+                        &nbsp;&nbsp;EA = 1;&nbsp;&nbsp;<span class="code-comment">// 开启总中断</span><br>
+                        &nbsp;&nbsp;EX0 = 1;&nbsp;&nbsp;<span class="code-comment">// 开启外部中断0</span><br>
+                        &nbsp;&nbsp;IT0 = 1;&nbsp;&nbsp;<span class="code-comment">// 下降沿触发</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 设置INT0引脚为输入模式</span><br>
+                        &nbsp;&nbsp;P3_2 = 1;<br>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">应用案例</div>
+                <div class="card-number">05</div>
+            </div>
+        </div>
+        
+        <!-- 卡片6：定时器0中断应用 -->
+        <div class="card visible" style="--card-color: var(--card-6)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2>定时器0中断应用</h2>
+            </div>
+            <div class="card-content">
+                <div class="application-case">
+                    <h4>应用场景：精确计时 - 电子时钟</h4>
+                    <p>使用定时器0每1秒产生一次中断，更新时钟显示，确保时间精准。</p>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-code"></i> 中断服务函数</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 定时器0中断服务函数 - 中断号1</span><br>
+                        void T0_ISR() interrupt 1 {<br>
+                        &nbsp;&nbsp;static int count = 0;&nbsp;&nbsp;<span class="code-comment">// 静态变量，保持值不变</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 重新加载定时器初值 (50ms)</span><br>
+                        &nbsp;&nbsp;TH0 = 0x3C;<br>
+                        &nbsp;&nbsp;TL0 = 0xB0;<br>
+                        &nbsp;&nbsp;count++;&nbsp;&nbsp;<span class="code-comment">// 中断次数计数</span><br>
+                        &nbsp;&nbsp;if(count == 20) {&nbsp;&nbsp;<span class="code-comment">// 20*50ms = 1秒到达</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;count = 0;&nbsp;&nbsp;<span class="code-comment">// 重置计数器</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;second++;&nbsp;&nbsp;<span class="code-comment">// 秒数加1</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;update_display();&nbsp;&nbsp;<span class="code-comment">// 更新显示</span><br>
+                        &nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 注意：定时器中断标志硬件自动清除</span><br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-cogs"></i> 初始化代码</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 初始化定时器0</span><br>
+                        void init_T0() {<br>
+                        &nbsp;&nbsp;EA = 1;&nbsp;&nbsp;<span class="code-comment">// 开启总中断</span><br>
+                        &nbsp;&nbsp;ET0 = 1;&nbsp;&nbsp;<span class="code-comment">// 开启定时器0中断</span><br>
+                        &nbsp;&nbsp;TMOD |= 0x01;&nbsp;&nbsp;<span class="code-comment">// 设置定时器0为模式1(16位定时器)</span><br>
+                        &nbsp;&nbsp;TH0 = 0x3C;&nbsp;&nbsp;<span class="code-comment">// 设置定时初值高8位</span><br>
+                        &nbsp;&nbsp;TL0 = 0xB0;&nbsp;&nbsp;<span class="code-comment">// 设置定时初值低8位 (50ms中断一次)</span><br>
+                        &nbsp;&nbsp;TR0 = 1;&nbsp;&nbsp;<span class="code-comment">// 启动定时器0</span><br>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">应用案例</div>
+                <div class="card-number">06</div>
+            </div>
+        </div>
+        
+        <!-- 卡片7：外部中断1应用 -->
+        <div class="card visible" style="--card-color: var(--card-7)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-signal"></i>
+                </div>
+                <h2>外部中断1应用</h2>
+            </div>
+            <div class="card-content">
+                <div class="application-case">
+                    <h4>应用场景：限位开关检测</h4>
+                    <p>自动门系统，当门移动到极限位置时触发限位开关，通过INT1立即停止电机运转。</p>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-code"></i> 中断服务函数</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 外部中断1服务函数 - 中断号2</span><br>
+                        void INT1_ISR() interrupt 2 {<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 检测限位开关状态</span><br>
+                        &nbsp;&nbsp;if(P3_3 == 0) {&nbsp;&nbsp;<span class="code-comment">// 检查INT1引脚是否为低电平</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;motor_stop();&nbsp;&nbsp;<span class="code-comment">// 立即停止电机</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;limit_flag = 1;&nbsp;&nbsp;<span class="code-comment">// 设置限位标志</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;buzzer_beep();&nbsp;&nbsp;<span class="code-comment">// 蜂鸣器提示</span><br>
+                        &nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 注意：外部中断标志硬件自动清除</span><br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-cogs"></i> 初始化代码</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 初始化外部中断1</span><br>
+                        void init_INT1() {<br>
+                        &nbsp;&nbsp;EA = 1;&nbsp;&nbsp;<span class="code-comment">// 开启总中断</span><br>
+                        &nbsp;&nbsp;EX1 = 1;&nbsp;&nbsp;<span class="code-comment">// 开启外部中断1</span><br>
+                        &nbsp;&nbsp;IT1 = 1;&nbsp;&nbsp;<span class="code-comment">// 下降沿触发</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 设置INT1引脚为输入模式</span><br>
+                        &nbsp;&nbsp;P3_3 = 1;<br>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">应用案例</div>
+                <div class="card-number">07</div>
+            </div>
+        </div>
+        
+        <!-- 卡片8：定时器1中断应用 -->
+        <div class="card visible" style="--card-color: var(--card-8)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h2>定时器1中断应用</h2>
+            </div>
+            <div class="card-content">
+                <div class="application-case">
+                    <h4>应用场景：PWM波形生成</h4>
+                    <p>电机速度控制，使用定时器1中断生成PWM信号，调节电机转速。</p>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-code"></i> 中断服务函数</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 定时器1中断服务函数 - 中断号3</span><br>
+                        void T1_ISR() interrupt 3 {<br>
+                        &nbsp;&nbsp;static int pwm_count = 0;&nbsp;&nbsp;<span class="code-comment">// PWM周期计数器</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 重新加载定时器初值 (10KHz PWM)</span><br>
+                        &nbsp;&nbsp;TH1 = 0xFC;<br>
+                        &nbsp;&nbsp;TL1 = 0x18;<br>
+                        &nbsp;&nbsp;pwm_count++;&nbsp;&nbsp;<span class="code-comment">// 计数器加1</span><br>
+                        &nbsp;&nbsp;<span class="code-comment">// 根据占空比控制输出</span><br>
+                        &nbsp;&nbsp;if(pwm_count < duty_cycle) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;PWM_OUT = 1;&nbsp;&nbsp;<span class="code-comment">// 高电平输出</span><br>
+                        &nbsp;&nbsp;} else {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;PWM_OUT = 0;&nbsp;&nbsp;<span class="code-comment">// 低电平输出</span><br>
+                        &nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 重置计数器 (100为一个完整PWM周期)</span><br>
+                        &nbsp;&nbsp;if(pwm_count >= 100) pwm_count = 0;<br>
+                        &nbsp;&nbsp;<span class="code-comment">// 注意：定时器中断标志硬件自动清除</span><br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-cogs"></i> 初始化代码</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 初始化定时器1</span><br>
+                        void init_T1() {<br>
+                        &nbsp;&nbsp;EA = 1;&nbsp;&nbsp;<span class="code-comment">// 开启总中断</span><br>
+                        &nbsp;&nbsp;ET1 = 1;&nbsp;&nbsp;<span class="code-comment">// 开启定时器1中断</span><br>
+                        &nbsp;&nbsp;TMOD |= 0x10;&nbsp;&nbsp;<span class="code-comment">// 设置定时器1为模式1(16位定时器)</span><br>
+                        &nbsp;&nbsp;TH1 = 0xFC;&nbsp;&nbsp;<span class="code-comment">// 设置定时初值高8位</span><br>
+                        &nbsp;&nbsp;TL1 = 0x18;&nbsp;&nbsp;<span class="code-comment">// 设置定时初值低8位 (0.1ms中断一次)</span><br>
+                        &nbsp;&nbsp;TR1 = 1;&nbsp;&nbsp;<span class="code-comment">// 启动定时器1</span><br>
+                        &nbsp;&nbsp;duty_cycle = 30;&nbsp;&nbsp;<span class="code-comment">// 设置初始占空比为30%</span><br>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">应用案例</div>
+                <div class="card-number">08</div>
+            </div>
+        </div>
+        
+        <!-- 卡片9：串行口中断应用 -->
+        <div class="card visible" style="--card-color: var(--card-1)">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h2>串行口中断应用 (RI/TI)</h2>
+            </div>
+            <div class="card-content">
+                <div class="application-case">
+                    <h4>应用场景：串口通信 - 无线遥控小车</h4>
+                    <p>当接收到遥控指令时，通过串口中断立即处理，控制小车运动。串口中断包括RI(接收中断)和TI(发送中断)。</p>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-code"></i> 中断服务函数</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 串行口中断服务函数 - 中断号4</span><br>
+                        void UART_ISR() interrupt 4 {<br>
+                        &nbsp;&nbsp;if(RI == 1) {&nbsp;&nbsp;<span class="code-comment">// 接收中断</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;RI = 0;&nbsp;&nbsp;<span class="code-comment">// 必须软件清除接收中断标志</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;received_data = SBUF;&nbsp;&nbsp;<span class="code-comment">// 读取接收到的数据</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;process_command(received_data);&nbsp;&nbsp;<span class="code-comment">// 处理命令</span><br>
+                        &nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;if(TI == 1) {&nbsp;&nbsp;<span class="code-comment">// 发送中断</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;TI = 0;&nbsp;&nbsp;<span class="code-comment">// 必须软件清除发送中断标志</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;tx_busy = 0;&nbsp;&nbsp;<span class="code-comment">// 设置发送空闲标志</span><br>
+                        &nbsp;&nbsp;}<br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-cogs"></i> 初始化代码</h3>
+                    <div class="code-block">
+                        <button class="copy-btn">复制代码</button>
+                        <span class="code-comment">// 初始化串口</span><br>
+                        void init_UART() {<br>
+                        &nbsp;&nbsp;EA = 1;&nbsp;&nbsp;<span class="code-comment">// 开启总中断</span><br>
+                        &nbsp;&nbsp;ES = 1;&nbsp;&nbsp;<span class="code-comment">// 开启串口中断</span><br>
+                        &nbsp;&nbsp;SCON = 0x50;&nbsp;&nbsp;<span class="code-comment">// 设置串口模式1(8位UART,可变波特率)</span><br>
+                        &nbsp;&nbsp;TMOD |= 0x20;&nbsp;&nbsp;<span class="code-comment">// 定时器1工作模式2(8位自动重装)</span><br>
+                        &nbsp;&nbsp;TH1 = 0xFD;&nbsp;&nbsp;<span class="code-comment">// 波特率9600 (11.0592MHz晶振)</span><br>
+                        &nbsp;&nbsp;TL1 = 0xFD;<br>
+                        &nbsp;&nbsp;TR1 = 1;&nbsp;&nbsp;<span class="code-comment">// 启动定时器1</span><br>
+                        &nbsp;&nbsp;tx_busy = 0;&nbsp;&nbsp;<span class="code-comment">// 初始化发送状态</span><br>
+                        }
+                    </div>
+                </div>
+                
+                <div class="demo">
+                    <h3><i class="fas fa-info-circle"></i> RI/TI标志说明</h3>
+                    <ul>
+                        <li><span class="highlight">RI (接收中断标志)</span>：当接收到一帧数据后由硬件置1，必须由软件清零</li>
+                        <li><span class="highlight">TI (发送中断标志)</span>：当发送完一帧数据后由硬件置1，必须由软件清零</li>
+                        <li>串口中断服务程序中必须检查RI和TI标志，确定中断来源</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-tag">应用案例</div>
+                <div class="card-number">09</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 中断演示区域 -->
+    <div class="interrupt-demo-container">
+        <h2><i class="fas fa-play-circle"></i> 中断过程交互演示</h2>
+        <p>点击下面的按钮模拟不同类型的中断，观察CPU如何处理中断请求</p>
+        
+        <div class="demo-controls">
+            <button class="demo-btn int0">
+                <i class="fas fa-signal"></i> 外部中断0
+            </button>
+            <button class="demo-btn t0">
+                <i class="fas fa-clock"></i> 定时器0中断
+            </button>
+            <button class="demo-btn int1">
+                <i class="fas fa-signal"></i> 外部中断1
+            </button>
+            <button class="demo-btn t1">
+                <i class="fas fa-clock"></i> 定时器1中断
+            </button>
+            <button class="demo-btn uart">
+                <i class="fas fa-exchange-alt"></i> 串口中断
+            </button>
+        </div>
+        
+        <div class="demo-visualization">
+            <div class="demo-cpu">CPU</div>
+            <div class="demo-program-flow"></div>
+            
+            <div class="demo-interrupt-source int0">INT0</div>
+            <div class="demo-interrupt-source t0">T0</div>
+            <div class="demo-interrupt-source int1">INT1</div>
+            <div class="demo-interrupt-source t1">T1</div>
+            <div class="demo-interrupt-source uart">UART</div>
+            
+            <div class="demo-interrupt-line int0"></div>
+            <div class="demo-interrupt-line t0"></div>
+            <div class="demo-interrupt-line int1"></div>
+            <div class="demo-interrupt-line t1"></div>
+            <div class="demo-interrupt-line uart"></div>
+        </div>
+        
+        <div class="demo-status" id="demoStatus">
+            系统空闲 - CPU正在执行主程序
+        </div>
+        
+        <div class="demo-step" id="step1">1. 中断源发出中断请求...</div>
+        <div class="demo-step" id="step2">2. CPU检测到中断，暂停当前指令...</div>
+        <div class="demo-step" id="step3">3. 保存现场，保护关键寄存器...</div>
+        <div class="demo-step" id="step4">4. 跳转到中断服务程序...</div>
+        <div class="demo-step" id="step5">5. 执行中断处理代码...</div>
+        <div class="demo-step" id="step6">6. 中断处理完成，恢复现场...</div>
+        <div class="demo-step" id="step7">7. 返回主程序继续执行...</div>
+    </div>
+    
+    <div class="footer">
+        <p>51单片机中断系统知识卡片 | 让复杂的技术变得简单有趣 | 每个卡片聚焦一个核心概念</p>
+    </div>
+
+    <script>
+        // 卡片滚动动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+            
+            // 代码复制功能
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.parentElement;
+                    const codeText = codeBlock.textContent.replace('复制代码', '').trim();
+                    
+                    navigator.clipboard.writeText(codeText).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = '已复制!';
+                        this.style.background = '#4CAF50';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.background = '';
+                        }, 2000);
+                    });
+                });
+            });
+            
+            // 中断演示功能
+            const demoButtons = document.querySelectorAll('.demo-btn');
+            const interruptSources = document.querySelectorAll('.demo-interrupt-source');
+            const interruptLines = document.querySelectorAll('.demo-interrupt-line');
+            const demoStatus = document.getElementById('demoStatus');
+            const cpu = document.querySelector('.demo-cpu');
+            const programFlow = document.querySelector('.demo-program-flow');
+            const demoSteps = document.querySelectorAll('.demo-step');
+            
+            // 重置所有演示状态
+            function resetDemo() {
+                interruptSources.forEach(source => {
+                    source.classList.remove('active');
+                });
+                
+                interruptLines.forEach(line => {
+                    line.style.height = '0';
+                });
+                
+                cpu.style.background = '';
+                programFlow.style.background = '';
+                
+                demoSteps.forEach(step => {
+                    step.classList.remove('active');
+                });
+            }
+            
+            // 显示步骤
+            function showStep(stepNumber) {
+                demoSteps.forEach(step => {
+                    step.classList.remove('active');
+                });
+                document.getElementById(`step${stepNumber}`).classList.add('active');
+            }
+            
+            demoButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const interruptType = this.classList[1]; // int0, t0, etc.
+                    
+                    // 重置所有状态
+                    resetDemo();
+                    
+                    // 激活选中的中断
+                    const activeSource = document.querySelector(`.demo-interrupt-source.${interruptType}`);
+                    const activeLine = document.querySelector(`.demo-interrupt-line.${interruptType}`);
+                    
+                    // 更新状态文本
+                    let statusText = '';
+                    let interruptName = '';
+                    switch(interruptType) {
+                        case 'int0':
+                            statusText = '外部中断0触发: 紧急停止按钮按下';
+                            interruptName = '外部中断0';
+                            break;
+                        case 't0':
+                            statusText = '定时器0中断触发: 1秒定时到达';
+                            interruptName = '定时器0';
+                            break;
+                        case 'int1':
+                            statusText = '外部中断1触发: 限位开关激活';
+                            interruptName = '外部中断1';
+                            break;
+                        case 't1':
+                            statusText = '定时器1中断触发: PWM周期完成';
+                            interruptName = '定时器1';
+                            break;
+                        case 'uart':
+                            statusText = '串口中断触发: 接收到数据';
+                            interruptName = '串口中断';
+                            break;
+                    }
+                    
+                    demoStatus.textContent = statusText;
+                    
+                    // 步骤1: 中断源发出中断请求
+                    setTimeout(() => {
+                        activeSource.classList.add('active');
+                        showStep(1);
+                    }, 500);
+                    
+                    // 步骤2: CPU检测到中断，暂停当前指令
+                    setTimeout(() => {
+                        activeLine.style.height = '130px';
+                        showStep(2);
+                    }, 1500);
+                    
+                    // 步骤3: 保存现场，保护关键寄存器
+                    setTimeout(() => {
+                        cpu.style.background = '#ff9e00';
+                        programFlow.style.background = '#ff9e00';
+                        showStep(3);
+                    }, 2500);
+                    
+                    // 步骤4: 跳转到中断服务程序
+                    setTimeout(() => {
+                        cpu.style.background = '#f72585';
+                        showStep(4);
+                    }, 3500);
+                    
+                    // 步骤5: 执行中断处理代码
+                    setTimeout(() => {
+                        showStep(5);
+                        demoStatus.textContent = `${statusText} - 正在执行中断服务程序`;
+                    }, 4500);
+                    
+                    // 步骤6: 中断处理完成，恢复现场
+                    setTimeout(() => {
+                        cpu.style.background = '#ff9e00';
+                        showStep(6);
+                    }, 5500);
+                    
+                    // 步骤7: 返回主程序继续执行
+                    setTimeout(() => {
+                        cpu.style.background = '#4361ee';
+                        programFlow.style.background = '#4cc9f0';
+                        activeLine.style.height = '0';
+                        activeSource.classList.remove('active');
+                        showStep(7);
+                        demoStatus.textContent = `${interruptName}处理完成，CPU返回主程序继续执行`;
+                    }, 6500);
+                    
+                    // 重置演示
+                    setTimeout(() => {
+                        resetDemo();
+                        demoStatus.textContent = '系统空闲 - CPU正在执行主程序';
+                        demoSteps.forEach(step => {
+                            step.classList.remove('active');
+                        });
+                    }, 8000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

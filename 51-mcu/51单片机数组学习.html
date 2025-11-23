@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机数组学习</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',  // 数据类型高亮
+                        dark: '#1D2129',
+                        light: '#F5F7FA',
+                        accent: '#FF7D00',     // 变量/数组名高亮
+                        success: '#52C41A'     // 数值/常量高亮
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Consolas', 'Monaco', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .code-block {
+                @apply bg-dark text-gray-200 p-4 rounded-lg font-mono text-sm overflow-x-auto my-4 leading-relaxed;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .section-fade {
+                @apply opacity-0 translate-y-6 transition-all duration-700;
+            }
+            .section-visible {
+                @apply opacity-100 translate-y-0;
+            }
+            .drawer {
+                @apply w-16 h-16 border-2 border-gray-300 rounded flex flex-col items-center justify-center transition-all duration-300;
+            }
+            .drawer-active {
+                @apply border-primary bg-primary/10 scale-110;
+            }
+            .led {
+                @apply w-8 h-8 rounded-full bg-gray-300 transition-all duration-300;
+            }
+            .led-on {
+                @apply bg-primary scale-110 shadow-md;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-dark">
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-microchip text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-primary">51数组学习</span>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#what-is" class="hover:text-primary transition-colors">什么是数组</a>
+                <a href="#define" class="hover:text-primary transition-colors">定义方法</a>
+                <a href="#usage" class="hover:text-primary transition-colors">使用示例</a>
+                <a href="#practice" class="hover:text-primary transition-colors">练习</a>
+            </div>
+            <button class="md:hidden text-dark" id="menu-toggle">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobile-menu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#what-is" class="py-2 hover:text-primary transition-colors">什么是数组</a>
+                <a href="#define" class="py-2 hover:text-primary transition-colors">定义方法</a>
+                <a href="#usage" class="py-2 hover:text-primary transition-colors">使用示例</a>
+                <a href="#practice" class="py-2 hover:text-primary transition-colors">练习</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="bg-gradient-to-r from-primary to-secondary text-white py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-3xl md:text-5xl font-bold mb-6 animate-fade-in">轻松学会51数组</h1>
+                <p class="text-lg md:text-xl opacity-90 mb-8">让代码更简洁、高效</p>
+                <a href="#what-is" class="inline-block bg-white text-primary font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                    开始学习 <i class="fa fa-arrow-down ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <!-- 什么是数组 -->
+        <section id="what-is" class="mb-20 section-fade">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+                        <i class="fa fa-question"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">什么是数组？</h2>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 md:p-8 mb-8">
+                    <p class="mb-4 text-lg">想象一排带编号的抽屉（从0开始），每个都能放东西。这排抽屉就像数组！</p>
+                    
+                    <div class="my-8">
+                        <div class="flex flex-wrap justify-center gap-4 mb-4" id="drawer-demo">
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">0</span>
+                                <span class="font-bold">10</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">1</span>
+                                <span class="font-bold">20</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">2</span>
+                                <span class="font-bold">30</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">3</span>
+                                <span class="font-bold">40</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">4</span>
+                                <span class="font-bold">50</span>
+                            </div>
+                        </div>
+                        <p class="text-center text-sm text-gray-500">数组就像一排有编号的抽屉，每个位置存一个数据</p>
+                    </div>
+                    
+                    <p class="mb-4">在51单片机中，数组是一组相同类型的变量，共用一个名字，用"索引"区分不同元素。</p>
+                    
+                    <div class="bg-light p-4 rounded-lg border-l-4 border-accent">
+                        <p class="font-medium">为什么要用数组？</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>方便存一组相关数据</li>
+                            <li>减少变量数量，代码更简洁</li>
+                            <li>便于循环批量处理数据</li>
+                            <li>适合存传感器数据、LED状态等</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数组的定义方法 -->
+        <section id="define" class="mb-20 section-fade">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+                        <i class="fa fa-code"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">如何定义数组？</h2>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 md:p-8 mb-8">
+                    <p class="mb-6">51单片机C语言中，定义数组的基本格式：</p>
+                    
+                    <div class="code-block">
+                        <span class="text-secondary">数据类型</span> <span class="text-accent">数组名</span>[<span class="text-success">大小</span>];
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 my-8">
+                        <div class="bg-light p-5 rounded-lg card-hover">
+                            <h3 class="font-bold text-lg mb-3 text-primary">1. 基本定义</h3>
+                            <div class="code-block text-sm">
+                                // 定义可存储5个整数的数组
+                                <span class="text-secondary">int</span> <span class="text-accent">a</span>[<span class="text-success">5</span>];
+                                
+                                // 定义可存储10个字符的数组
+                                <span class="text-secondary">char</span> <span class="text-accent">b</span>[<span class="text-success">10</span>];
+                                
+                                // 定义可存储8个无符号字符的数组（单片机常用）
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">c</span>[<span class="text-success">8</span>];
+                            </div>
+                        </div>
+                        
+                        <div class="bg-light p-5 rounded-lg card-hover">
+                            <h3 class="font-bold text-lg mb-3 text-primary">2. 定义并初始化</h3>
+                            <div class="code-block text-sm">
+                                // 定义数组并初始化3个元素
+                                <span class="text-secondary">int</span> <span class="text-accent">s</span>[<span class="text-success">3</span>] = { 
+                                    <span class="text-success">90</span>, 
+                                    <span class="text-success">85</span>, 
+                                    <span class="text-success">95</span> 
+                                };
+                                
+                                // 省略大小，编译器自动计算（此处大小为3）
+                                <span class="text-secondary">char</span> <span class="text-accent">f</span>[] = { 
+                                    <span class="text-success">'A'</span>, 
+                                    <span class="text-success">'B'</span>, 
+                                    <span class="text-success">'C'</span> 
+                                };
+                                
+                                // 部分初始化，未赋值元素自动为0
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">d</span>[<span class="text-success">5</span>] = { 
+                                    <span class="text-success">1</span>, 
+                                    <span class="text-success">2</span> 
+                                };
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
+                        <p class="font-medium flex items-center">
+                            <i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i>
+                            注意事项
+                        </p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm">
+                            <li>数组索引从0开始，不是1（第一个元素是a[0]，不是a[1]）</li>
+                            <li>大小必须是常量（如5、10），不能是变量</li>
+                            <li>51单片机内存有限，数组不宜过大（通常不超过100个元素）</li>
+                            <li>访问时不要超出范围（如a[5]不能访问定义为a[5]的数组）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数组的使用示例 -->
+        <section id="usage" class="mb-20 section-fade">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+                        <i class="fa fa-play-circle"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">使用示例</h2>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+                    <p class="mb-6">通过实际例子学习使用数组：</p>
+                    
+                    <div class="mb-10">
+                        <h3 class="font-bold text-xl mb-4 text-primary">示例1：LED流水灯</h3>
+                        <p class="mb-4">用数组存LED状态，实现流水灯：</p>
+                        
+                        <div class="code-block text-sm">
+                            #include &lt;reg51.h&gt;
+                            
+                            // 延时函数（简单实现）
+                            <span class="text-secondary">void</span> <span class="text-accent">d</span>(<span class="text-secondary">unsigned int</span> <span class="text-accent">t</span>) {
+                                while(t--);  // 通过空循环实现延时
+                            }
+                            
+                            <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                // 存储8种LED状态的数组（P0口控制8个LED）
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">l</span>[<span class="text-success">8</span>] = {
+                                    <span class="text-success">0xFE</span>,  // 二进制：11111110 → 第一个LED亮
+                                    <span class="text-success">0xFD</span>,  // 二进制：11111101 → 第二个LED亮
+                                    <span class="text-success">0xFB</span>,  // 二进制：11111011 → 第三个LED亮
+                                    <span class="text-success">0xF7</span>,  // 二进制：11110111 → 第四个LED亮
+                                    <span class="text-success">0xEF</span>,  // 二进制：11101111 → 第五个LED亮
+                                    <span class="text-success">0xDF</span>,  // 二进制：11011111 → 第六个LED亮
+                                    <span class="text-success">0xBF</span>,  // 二进制：10111111 → 第七个LED亮
+                                    <span class="text-success">0x7F</span>   // 二进制：01111111 → 第八个LED亮
+                                };
+                                
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                
+                                while(<span class="text-success">1</span>) {  // 无限循环
+                                    // 依次显示数组中的每种状态
+                                    for(i = <span class="text-success">0</span>; i < <span class="text-success">8</span>; i++) {
+                                        P0 = l[i];  // 将数组元素值赋给P0口（控制LED）
+                                        d(<span class="text-success">50000</span>);   // 延时一段时间
+                                    }
+                                }
+                            }
+                        </div>
+                        
+                        <!-- LED动画演示 -->
+                        <div class="my-6">
+                            <p class="font-medium mb-3">效果演示：</p>
+                            <div class="flex justify-center gap-2 p-4 bg-light rounded-lg">
+                                <div class="led" id="led0"></div>
+                                <div class="led" id="led1"></div>
+                                <div class="led" id="led2"></div>
+                                <div class="led" id="led3"></div>
+                                <div class="led" id="led4"></div>
+                                <div class="led" id="led5"></div>
+                                <div class="led" id="led6"></div>
+                                <div class="led" id="led7"></div>
+                            </div>
+                            <button id="start-led" class="mt-2 px-4 py-1 bg-primary text-white rounded hover:bg-primary/90 transition-colors">
+                                开始演示
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-10">
+                        <h3 class="font-bold text-xl mb-4 text-primary">示例2：存储传感器数据</h3>
+                        <p class="mb-4">用数组存多次传感器数据：</p>
+                        
+                        <div class="code-block text-sm">
+                            #include &lt;reg51.h&gt;
+                            
+                            // 读取传感器数据的函数（示例）
+                            <span class="text-secondary">unsigned int</span> <span class="text-accent">r</span>() {
+                                // 实际应用中，这里会有读取传感器的代码
+                                return <span class="text-success">0</span>;  // 仅作示例返回0
+                            }
+                            
+                            <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                <span class="text-secondary">unsigned int</span> <span class="text-accent">d</span>[<span class="text-success">10</span>];  // 存储10次传感器数据
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                
+                                // 采集10次传感器数据
+                                for(i = <span class="text-success">0</span>; i < <span class="text-success">10</span>; i++) {
+                                    d[i] = r();  // 调用传感器读取函数，结果存入数组
+                                    // 此处可添加延时，控制采集间隔
+                                }
+                                
+                                // 后续可处理数组中的数据
+                                // 例如：计算平均值、找最大值等
+                                
+                                while(<span class="text-success">1</span>);  // 程序停留
+                            }
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 text-primary">数组访问演示</h3>
+                        <p class="mb-4">点击按钮查看数组元素访问：</p>
+                        
+                        <div class="flex flex-wrap justify-center gap-4 mb-4" id="array-demo">
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">0</span>
+                                <span class="font-bold">10</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">1</span>
+                                <span class="font-bold">20</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">2</span>
+                                <span class="font-bold">30</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">3</span>
+                                <span class="font-bold">40</span>
+                            </div>
+                            <div class="drawer">
+                                <span class="text-xs text-gray-500">4</span>
+                                <span class="font-bold">50</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap justify-center gap-2 mb-4">
+                            <button class="access-btn px-3 py-1 bg-gray-200 rounded hover:bg-primary hover:text-white transition-colors" data-index="0">访问 0</button>
+                            <button class="access-btn px-3 py-1 bg-gray-200 rounded hover:bg-primary hover:text-white transition-colors" data-index="1">访问 1</button>
+                            <button class="access-btn px-3 py-1 bg-gray-200 rounded hover:bg-primary hover:text-white transition-colors" data-index="2">访问 2</button>
+                            <button class="access-btn px-3 py-1 bg-gray-200 rounded hover:bg-primary hover:text-white transition-colors" data-index="3">访问 3</button>
+                            <button class="access-btn px-3 py-1 bg-gray-200 rounded hover:bg-primary hover:text-white transition-colors" data-index="4">访问 4</button>
+                        </div>
+                        
+                        <div class="code-block text-sm" id="access-code">
+                            // 定义数组
+                            <span class="text-secondary">int</span> <span class="text-accent">a</span>[<span class="text-success">5</span>] = { 
+                                <span class="text-success">10</span>, 
+                                <span class="text-success">20</span>, 
+                                <span class="text-success">30</span>, 
+                                <span class="text-success">40</span>, 
+                                <span class="text-success">50</span> 
+                            };
+                            
+                            // 访问代码将显示在这里
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 互动练习 -->
+        <section id="practice" class="mb-12 section-fade">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white mr-4">
+                        <i class="fa fa-pencil"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">互动练习</h2>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+                    <p class="mb-6">完成练习，巩固知识：</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-bold text-lg mb-3">练习1：填充数组</h3>
+                        <p class="mb-4">将1到10填充到数组中：</p>
+                        
+                        <div class="code-block text-sm mb-4 h-48">
+                            #include &lt;reg51.h&gt;
+                            
+                            <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                <span class="text-secondary">int</span> <span class="text-accent">a</span>[<span class="text-success">10</span>];  // 存储10个整数的数组
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                
+                                // 填充1到10到数组中
+                                
+                                for(i = <span class="text-success">0</span>; i < <span class="text-success">10</span>; i++) {
+                                    // 写下你的代码
+                                }
+                                
+                                while(<span class="text-success">1</span>);  // 程序停留
+                            }
+                        </div>
+                        
+                        <button id="show-answer1" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-colors">
+                            查看答案
+                        </button>
+                        
+                        <div id="answer1" class="hidden mt-4 p-4 bg-light rounded-lg">
+                            <div class="code-block text-sm">
+                                #include &lt;reg51.h&gt;
+                                
+                                <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                    <span class="text-secondary">int</span> <span class="text-accent">a</span>[<span class="text-success">10</span>];  // 存储10个整数的数组
+                                    <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                    
+                                    // 填充1到10到数组中
+                                    for(i = <span class="text-success">0</span>; i < <span class="text-success">10</span>; i++) {
+                                        a[i] = i + <span class="text-success">1</span>;  // 索引从0开始，加1得到1-10
+                                    }
+                                    
+                                    while(<span class="text-success">1</span>);  // 程序停留
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-bold text-lg mb-3">练习2：计算总和</h3>
+                        <p class="mb-4">计算数组元素的总和：</p>
+                        
+                        <div class="code-block text-sm mb-4 h-48">
+                            #include &lt;reg51.h&gt;
+                            
+                            <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                <span class="text-secondary">int</span> <span class="text-accent">a</span>[] = { 
+                                    <span class="text-success">15</span>, 
+                                    <span class="text-success">23</span>, 
+                                    <span class="text-success">8</span>, 
+                                    <span class="text-success">42</span>, 
+                                    <span class="text-success">10</span> 
+                                };
+                                <span class="text-secondary">int</span> <span class="text-accent">s</span> = <span class="text-success">0</span>;       // 用于存储总和
+                                <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                
+                                // 计算数组元素的总和
+                                
+                                
+                                while(<span class="text-success">1</span>);  // 程序停留
+                            }
+                        </div>
+                        
+                        <button id="show-answer2" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-colors">
+                            查看答案
+                        </button>
+                        
+                        <div id="answer2" class="hidden mt-4 p-4 bg-light rounded-lg">
+                            <div class="code-block text-sm">
+                                #include &lt;reg51.h&gt;
+                                
+                                <span class="text-secondary">void</span> <span class="text-accent">main</span>() {
+                                    <span class="text-secondary">int</span> <span class="text-accent">a</span>[] = { 
+                                        <span class="text-success">15</span>, 
+                                        <span class="text-success">23</span>, 
+                                        <span class="text-success">8</span>, 
+                                        <span class="text-success">42</span>, 
+                                        <span class="text-success">10</span> 
+                                    };
+                                    <span class="text-secondary">int</span> <span class="text-accent">s</span> = <span class="text-success">0</span>;       // 用于存储总和
+                                    <span class="text-secondary">unsigned char</span> <span class="text-accent">i</span>;  // 循环变量
+                                    
+                                    // 计算数组元素的总和
+                                    for(i = <span class="text-success">0</span>; i < <span class="text-success">5</span>; i++) {
+                                        s = s + a[i];  // 累加数组元素值到总和
+                                        // 也可简写为：s += a[i];
+                                    }
+                                    
+                                    while(<span class="text-success">1</span>);  // 程序停留
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结 -->
+        <section class="mb-12 section-fade">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-primary/10 rounded-xl p-6 md:p-8 border border-primary/20">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">数组知识总结</h2>
+                    
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>数组是相同类型变量的集合，用名字和索引访问</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>定义格式：<code class="bg-white px-1 rounded">类型 名[大小];</code></span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>索引从0开始，<code class="bg-white px-1 rounded">a[0]</code> 是第一个元素</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>用循环可高效操作所有元素</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>常用于存储LED状态、传感器数据等</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="flex justify-center items-center mb-4">
+                    <i class="fa fa-microchip text-primary text-2xl mr-2"></i>
+                    <span class="text-xl font-bold">51单片机数组学习</span>
+                </div>
+                <p class="text-gray-400 mb-6">帮助初学者轻松掌握数组知识</p>
+                <p class="text-gray-500 text-sm mt-6">© 2023 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'shadow-lg');
+                navbar.classList.remove('py-3', 'shadow-md');
+            } else {
+                navbar.classList.add('py-3', 'shadow-md');
+                navbar.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+        
+        // 抽屉动画效果
+        const drawers = document.querySelectorAll('.drawer');
+        drawers.forEach((drawer, i) => {
+            setTimeout(() => {
+                drawer.classList.add('drawer-active');
+                setTimeout(() => drawer.classList.remove('drawer-active'), 500);
+            }, 300 + i * 200);
+        });
+        
+        // 数组访问演示
+        const arrayItems = document.querySelectorAll('#array-demo > div');
+        const accessBtns = document.querySelectorAll('.access-btn');
+        const accessCode = document.getElementById('access-code');
+        
+        accessBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 重置所有元素
+                arrayItems.forEach(item => {
+                    item.classList.remove('drawer-active');
+                });
+                
+                // 高亮当前元素
+                const idx = this.getAttribute('data-index');
+                arrayItems[idx].classList.add('drawer-active');
+                
+                // 显示代码
+                accessCode.innerHTML = `// 定义数组
+<span class="text-secondary">int</span> <span class="text-accent">a</span>[<span class="text-success">5</span>] = { 
+    <span class="text-success">10</span>, 
+    <span class="text-success">20</span>, 
+    <span class="text-success">30</span>, 
+    <span class="text-success">40</span>, 
+    <span class="text-success">50</span> 
+};
+
+// 访问索引 ${idx} 的元素
+<span class="text-secondary">int</span> <span class="text-accent">v</span> = a[${idx}];  // v 的值为 ${arrayItems[idx].querySelector('span:last-child').textContent}`;
+            });
+        });
+        
+        // LED流水灯演示
+        let ledInterval;
+        let currentLed = 0;
+        const leds = [
+            document.getElementById('led0'),
+            document.getElementById('led1'),
+            document.getElementById('led2'),
+            document.getElementById('led3'),
+            document.getElementById('led4'),
+            document.getElementById('led5'),
+            document.getElementById('led6'),
+            document.getElementById('led7')
+        ];
+        
+        function resetLeds() {
+            leds.forEach(led => led.classList.remove('led-on'));
+        }
+        
+        function animateLeds() {
+            resetLeds();
+            leds[currentLed].classList.add('led-on');
+            currentLed = (currentLed + 1) % 8;
+        }
+        
+        document.getElementById('start-led').addEventListener('click', function() {
+            const btn = this;
+            if (ledInterval) {
+                clearInterval(ledInterval);
+                ledInterval = null;
+                resetLeds();
+                btn.textContent = '开始演示';
+            } else {
+                animateLeds();
+                ledInterval = setInterval(animateLeds, 300);
+                btn.textContent = '停止演示';
+            }
+        });
+        
+        // 显示答案按钮
+        document.getElementById('show-answer1').addEventListener('click', function() {
+            document.getElementById('answer1').classList.toggle('hidden');
+        });
+        
+        document.getElementById('show-answer2').addEventListener('click', function() {
+            document.getElementById('answer2').classList.toggle('hidden');
+        });
+        
+        // 滚动显示动画
+        function checkSections() {
+            const sections = document.querySelectorAll('.section-fade');
+            
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight * 0.85) {
+                    section.classList.add('section-visible');
+                }
+            });
+        }
+        
+        // 初始检查
+        window.addEventListener('load', checkSections);
+        // 滚动时检查
+        window.addEventListener('scroll', checkSections);
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 关闭移动菜单
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

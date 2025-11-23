@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机入门知识</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .highlight {
+            position: relative;
+            display: inline-block;
+        }
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(99, 102, 241, 0.2);
+            z-index: -1;
+        }
+        .code-block {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            color: #334155;
+            overflow-x: auto;
+        }
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 md:px-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">51单片机入门知识</h1>
+            <p class="text-lg text-gray-600">零基础学习指南 · 配图详解版</p>
+        </header>
+
+        <main class="space-y-8">
+            <!-- 单片机的内部结构 -->
+            <section class="glass-card p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="section-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">单片机的内部结构</h2>
+                </div>
+                
+                <img src="https://p11-doubao-search-sign.byteimg.com/labis/86a77dcb19408d9099df85f703f94111~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1762440643&x-signature=156kZouGockKWz%2FJbPOfaWI0mDU%3D" alt="51单片机内部结构示意图">
+                
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-700">核心组件：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><span class="font-medium">CPU</span>：运算和控制中心</li>
+                        <li><span class="font-medium">RAM</span>：数据临时存储（128B-512B）</li>
+                        <li><span class="font-medium">ROM</span>：程序存储（4KB-64KB）</li>
+                        <li><span class="font-medium">并行IO口</span>：P0-P3通用输入输出</li>
+                        <li><span class="font-medium">串行口</span>：UART异步通信接口</li>
+                        <li><span class="font-medium">定时器/计数器</span>：3个16位定时器（T0/T1/T2）</li>
+                        <li><span class="font-medium">中断系统</span>：5个中断源（外部/定时/串口）</li>
+                        <li><span class="font-medium">时钟电路</span>：11.0592MHz晶振</li>
+                        <li><span class="font-medium">控制信号</span>：ALE、PSEN、EA等</li>
+                        <li><span class="font-medium">特色功能寄存器</span>：特殊功能寄存器（SFR）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 8051引脚功能 -->
+            <section class="glass-card p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="section-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">8051引脚功能</h2>
+                </div>
+                
+                <img src="https://p26-doubao-search-sign.byteimg.com/labis/52a6df202542c2a8f8264bdec0206427~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1762440642&x-signature=1LZwTBvKinH5AkSg%2BdVSDkJCyYs%3D" alt="8051引脚分布图">
+                
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-700">并行IO口：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><span class="font-medium">P0</span>：8位漏极开路输出，需外接上拉电阻</li>
+                        <li><span class="font-medium">P1-P3</span>：内部带上拉电阻，准双向IO口</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold text-gray-700">电阻配置：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><span class="font-medium">上拉电阻</span>：增强输出高电平驱动能力</li>
+                        <li><span class="font-medium">下拉电阻</span>：稳定输入低电平状态</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- C51程序基础 -->
+            <section class="glass-card p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="section-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">C51程序基础</h2>
+                </div>
+                
+                <img src="https://p3-doubao-search-sign.byteimg.com/labis/ff4ad36cfb56ee103bdcf81341d8f8bb~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1762440643&x-signature=XXItNaLVzVh1%2BFIRo3HaVHLHEoQ%3D" alt="C51程序代码示例">
+                
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-700">数制转换：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>二进制（0b1010）→ 十进制（10）→ 十六进制（0x0A）</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold text-gray-700">变量定义：</h3>
+                    <div class="code-block">
+                        sbit LED = P1^0;      // 位定义<br>
+                        unsigned char data cnt; // 数据区变量
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-gray-700">基本语句：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>顺序结构、分支结构（if-else）、循环结构（for/while）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 单片机最小系统电路 -->
+            <section class="glass-card p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="section-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">单片机最小系统电路</h2>
+                </div>
+                
+                <img src="https://p11-doubao-search-sign.byteimg.com/labis/fa420403c3cf3fda13ae33f759b16bc4~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1762440643&x-signature=1X3SSuA9peqxAXNcNmoENK%2Fmke4%3D" alt="单片机最小系统电路图">
+                
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-700">核心元件：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>单片机芯片（89C52）</li>
+                        <li>晶振电路（11.0592MHz + 22pF电容）</li>
+                        <li>复位电路（10K电阻 + 10uF电容）</li>
+                        <li>电源电路（5V直流供电）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 并行IO的结构与应用 -->
+            <section class="glass-card p-6 md:p-8">
+                <div class="flex items-center mb-6">
+                    <div class="section-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">并行IO的结构与应用</h2>
+                </div>
+                
+                <img src="https://p26-doubao-search-sign.byteimg.com/labis/072b78d47d281855152f448ada0b8a7b~tplv-be4g95zd3a-image.jpeg?rk3s=542c0f93&x-expires=1762440643&x-signature=tUD8lh%2BeEHIZK6VCneo7JWgnGK4%3D" alt="并行IO口应用电路">
+                
+                <div class="space-y-4">
+                    <h3 class="text-xl font-semibold text-gray-700">结构特点：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>准双向口设计，支持输入/输出切换</li>
+                        <li>每位可独立操作（位寻址功能）</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold text-gray-700">典型应用：</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>输出：LED流水灯、数码管显示</li>
+                        <li>输入：独立按键检测、矩阵键盘扫描</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <div class="flex justify-center space-x-4 mb-4">
+                <a href="#" class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-info-circle"></i> 学习提示</a>
+                <span>点击图标可查看高清原理图</span>
+            </div>
+            <div class="mb-4">
+                <i class="fas fa-mobile-alt mr-2"></i> 扫码获取仿真文件
+            </div>
+            <div class="border-t pt-4">
+                <p>页面内容均由 AI 生成，仅供参考</p>
+                <p>created by <a href="https://space.coze.cn" class="text-indigo-600 hover:underline">coze space</a></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

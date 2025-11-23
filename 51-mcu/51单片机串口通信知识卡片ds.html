@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机串口通信知识卡片</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #f8f9fa 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 150, 200, 0.2);
+            animation: fadeInDown 1s ease-out;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 150, 200, 0.15);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+            border-top: 5px solid;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 150, 200, 0.25);
+        }
+        
+        .card-communication {
+            border-top-color: #0077b6;
+        }
+        
+        .card-methods {
+            border-top-color: #00b4d8;
+        }
+        
+        .card-serial {
+            border-top-color: #48cae4;
+        }
+        
+        .card-params {
+            border-top-color: #90e0ef;
+        }
+        
+        .card-frame {
+            border-top-color: #0077b6;
+        }
+        
+        .card-register {
+            border-top-color: #00b4d8;
+        }
+        
+        .card-init {
+            border-top-color: #48cae4;
+        }
+        
+        .card-send-receive {
+            border-top-color: #90e0ef;
+        }
+        
+        .card-baudrate {
+            border-top-color: #0077b6;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+            flex-grow: 1;
+        }
+        
+        .card-communication .card-title {
+            color: #0077b6;
+            border-bottom-color: #0077b6;
+        }
+        
+        .card-methods .card-title {
+            color: #00b4d8;
+            border-bottom-color: #00b4d8;
+        }
+        
+        .card-serial .card-title {
+            color: #48cae4;
+            border-bottom-color: #48cae4;
+        }
+        
+        .card-params .card-title {
+            color: #90e0ef;
+            border-bottom-color: #90e0ef;
+        }
+        
+        .card-frame .card-title {
+            color: #0077b6;
+            border-bottom-color: #0077b6;
+        }
+        
+        .card-register .card-title {
+            color: #00b4d8;
+            border-bottom-color: #00b4d8;
+        }
+        
+        .card-init .card-title {
+            color: #48cae4;
+            border-bottom-color: #48cae4;
+        }
+        
+        .card-send-receive .card-title {
+            color: #90e0ef;
+            border-bottom-color: #90e0ef;
+        }
+        
+        .card-baudrate .card-title {
+            color: #0077b6;
+            border-bottom-color: #0077b6;
+        }
+        
+        .card-content {
+            font-size: 1.05rem;
+            color: #444;
+            flex-grow: 1;
+        }
+        
+        .highlight {
+            background-color: #caf0f8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 150, 200, 0.15);
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .demo-title {
+            font-size: 1.8rem;
+            color: #0077b6;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .demo-title::before, .demo-title::after {
+            content: "";
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0077b6, transparent);
+        }
+        
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .serial-animation {
+            width: 100%;
+            max-width: 700px;
+            height: 180px;
+            background: #f8f9fa;
+            border: 2px solid #0077b6;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(90deg, transparent 49%, rgba(0, 150, 200, 0.1) 50%, transparent 51%);
+        }
+        
+        .data-packet {
+            position: absolute;
+            width: 50px;
+            height: 30px;
+            background: #00b4d8;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 700px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-comment {
+            color: #81e6d9;
+        }
+        
+        .code-keyword {
+            color: #feb2b2;
+        }
+        
+        .code-function {
+            color: #90cdf4;
+        }
+        
+        .code-value {
+            color: #faf089;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #0077b6;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 150, 200, 0.1);
+        }
+        
+        .register-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .register-table th, .register-table td {
+            border: 1px solid #0077b6;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .register-table th {
+            background-color: #caf0f8;
+            color: #0077b6;
+            font-weight: 600;
+        }
+        
+        .bit-highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        
+        .interactive-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #0077b6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 119, 182, 0.2);
+        }
+        
+        .btn:hover {
+            background: #005b8a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.3);
+        }
+        
+        .led-demo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .led {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.4s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .led::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .led.on {
+            background: #ff3b30;
+            box-shadow: 0 0 25px #ff3b30;
+        }
+        
+        .led.on::after {
+            opacity: 0.6;
+        }
+        
+        .led.off {
+            background: #ddd;
+        }
+        
+        .data-frame {
+            display: flex;
+            margin: 15px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .frame-bit {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #0077b6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 2px;
+            background: white;
+            transition: all 0.3s;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-size: 0.9rem;
+        }
+        
+        .frame-bit.start {
+            background: #ffcc00;
+            color: #333;
+        }
+        
+        .frame-bit.data {
+            background: #4cd964;
+            color: white;
+        }
+        
+        .frame-bit.stop {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .case-study {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 5px solid #0077b6;
+        }
+        
+        .case-title {
+            color: #0077b6;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .comparison-item {
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .serial-comparison {
+            background: #e8f4f8;
+            border-left: 5px solid #0077b6;
+        }
+        
+        .parallel-comparison {
+            background: #f0f8e8;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .comparison-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #0077b6;
+        }
+        
+        .parallel-comparison .comparison-title {
+            color: #4caf50;
+        }
+        
+        .param-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .param-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .param-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .param-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .param-content {
+            flex: 1;
+        }
+        
+        .param-title {
+            font-weight: 600;
+            color: #0077b6;
+            margin-bottom: 5px;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #e8f4f8;
+            color: #0077b6;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .scon-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #0077b6;
+        }
+        
+        .scon-example-title {
+            font-weight: 600;
+            color: #0077b6;
+            margin-bottom: 10px;
+        }
+        
+        .frame-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+            height: 100px;
+        }
+        
+        .frame-transmission {
+            width: 80%;
+            height: 60px;
+            border: 2px solid #0077b6;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .frame-bit-moving {
+            position: absolute;
+            width: 50px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            left: -60px;
+            top: 10px;
+            transition: left 0.5s linear;
+        }
+        
+        .frame-bit-moving.start {
+            background: #ffcc00;
+            color: #333;
+        }
+        
+        .frame-bit-moving.data {
+            background: #4cd964;
+            color: white;
+        }
+        
+        .frame-bit-moving.stop {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes moveData {
+            0% {
+                left: -60px;
+            }
+            100% {
+                left: calc(100% + 60px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-title::before, .demo-title::after {
+                display: none;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>51单片机串口通信知识卡片</h1>
+            <p class="subtitle">专为零基础小白设计，用通俗易懂的方式学习单片机通信原理</p>
+        </header>
+        
+        <div class="cards-container">
+            <div class="card card-communication">
+                <div class="card-header">
+                    <div class="card-icon">📡</div>
+                    <h2 class="card-title">什么是通信</h2>
+                </div>
+                <div class="card-content">
+                    <p>通信就是<span class="highlight">信息交换的过程</span>，就像两个人对话一样，设备之间也需要"交流"来协同工作。</p>
+                    <p>在单片机系统中，通信是单片机与外部设备（如传感器、显示屏、计算机等）交换数据的方式。</p>
+                    <div class="case-study">
+                        <div class="case-title">💡 实际案例</div>
+                        <p>你的手机通过蓝牙与耳机通信，把音乐数据传给耳机播放。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-methods">
+                <div class="card-header">
+                    <div class="card-icon">🔄</div>
+                    <h2 class="card-title">通信的方式</h2>
+                </div>
+                <div class="card-content">
+                    <p>通信主要有两种基本方式：</p>
+                    <div class="comparison">
+                        <div class="comparison-item serial-comparison">
+                            <h3 class="comparison-title">串行通信</h3>
+                            <p>数据<span class="highlight">逐位依次传输</span>，只需一条数据线</p>
+                            <ul>
+                                <li>优点：节省线路，适合远距离</li>
+                                <li>缺点：速度相对较慢</li>
+                                <li>应用：USB、网络、蓝牙</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-item parallel-comparison">
+                            <h3 class="comparison-title">并行通信</h3>
+                            <p>数据<span class="highlight">多位同时传输</span>，需要多条数据线</p>
+                            <ul>
+                                <li>优点：传输速度快</li>
+                                <li>缺点：线路多，成本高</li>
+                                <li>应用：打印机、早期硬盘</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-serial">
+                <div class="card-header">
+                    <div class="card-icon">➡️</div>
+                    <h2 class="card-title">串口通信</h2>
+                </div>
+                <div class="card-content">
+                    <p>串口通信是单片机最常用的通信方式之一，数据<span class="highlight">一位一位地顺序传送</span>。</p>
+                    <p>就像单车道公路，车辆只能一辆接一辆通过，但道路建设成本低。</p>
+                    
+                    <div class="interactive-controls">
+                        <button class="btn" onclick="sendSerialData()">发送串口数据</button>
+                    </div>
+                    
+                    <div id="serial-status" class="status-message">点击按钮模拟串口数据传输</div>
+                    
+                    <div class="case-study">
+                        <div class="case-title">📱 实际应用</div>
+                        <p>你的Arduino通过串口与电脑通信，把传感器数据发送给电脑显示。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-params">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <h2 class="card-title">串口参数设置</h2>
+                </div>
+                <div class="card-content">
+                    <p>串口通信需要通信双方约定好参数才能正确传输数据：</p>
+                    
+                    <div class="param-list">
+                        <div class="param-item">
+                            <div class="param-icon">🚀</div>
+                            <div class="param-content">
+                                <div class="param-title">波特率</div>
+                                <p>数据传输的速度，单位bps（位/秒）</p>
+                            </div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-icon">🔢</div>
+                            <div class="param-content">
+                                <div class="param-title">数据位</div>
+                                <p>每个数据帧包含的数据位数，通常是8位</p>
+                            </div>
+                        </div>
+                        <div class="param-item">
+                            <div class="param-icon">🛑</div>
+                            <div class="param-content">
+                                <div class="param-title">停止位</div>
+                                <p>表示数据帧结束的位数，通常是1位</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="interactive-controls">
+                        <button class="btn" onclick="changeBaudRate(9600)">9600波特率</button>
+                        <button class="btn" onclick="changeBaudRate(115200)">115200波特率</button>
+                    </div>
+                    <p id="baud-rate-display" class="status-message">当前波特率: 9600</p>
+                </div>
+            </div>
+            
+            <div class="card card-frame">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <h2 class="card-title">数据帧传输</h2>
+                </div>
+                <div class="card-content">
+                    <p>串口通信以"帧"为单位传输数据，每帧包含：</p>
+                    
+                    <div class="data-frame">
+                        <div class="frame-bit start">起始位</div>
+                        <div class="frame-bit data">D0</div>
+                        <div class="frame-bit data">D1</div>
+                        <div class="frame-bit data">D2</div>
+                        <div class="frame-bit data">D3</div>
+                        <div class="frame-bit data">D4</div>
+                        <div class="frame-bit data">D5</div>
+                        <div class="frame-bit data">D6</div>
+                        <div class="frame-bit data">D7</div>
+                        <div class="frame-bit stop">停止位</div>
+                    </div>
+                    
+                    <p>起始位(1位) + 数据位(8位) + 停止位(1位) = 10位/帧</p>
+                    
+                    <div class="frame-animation">
+                        <div class="frame-transmission" id="frame-transmission">
+                            <div class="frame-bit-moving start" id="start-bit">起始位</div>
+                            <div class="frame-bit-moving data" id="data-bit-0">D0</div>
+                            <div class="frame-bit-moving data" id="data-bit-1">D1</div>
+                            <div class="frame-bit-moving data" id="data-bit-2">D2</div>
+                            <div class="frame-bit-moving data" id="data-bit-3">D3</div>
+                            <div class="frame-bit-moving data" id="data-bit-4">D4</div>
+                            <div class="frame-bit-moving data" id="data-bit-5">D5</div>
+                            <div class="frame-bit-moving data" id="data-bit-6">D6</div>
+                            <div class="frame-bit-moving data" id="data-bit-7">D7</div>
+                            <div class="frame-bit-moving stop" id="stop-bit">停止位</div>
+                        </div>
+                    </div>
+                    
+                    <div class="interactive-controls">
+                        <button class="btn" onclick="startFrameAnimation()">开始帧传输</button>
+                        <button class="btn" onclick="resetFrameAnimation()">重置</button>
+                    </div>
+                    
+                    <div id="frame-status" class="status-message">点击按钮查看数据帧传输过程</div>
+                </div>
+            </div>
+            
+            <div class="card card-register">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <h2 class="card-title">SCON寄存器详解</h2>
+                </div>
+                <div class="card-content">
+                    <p>SCON（串行控制寄存器）是配置串口工作方式的关键，它是一个8位寄存器：</p>
+                    <table class="register-table">
+                        <tr>
+                            <th>位</th>
+                            <th>名称</th>
+                            <th>功能说明</th>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">SM0</td>
+                            <td>串行模式位0</td>
+                            <td>与SM1一起决定串口工作方式</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">SM1</td>
+                            <td>串行模式位1</td>
+                            <td>与SM0一起决定串口工作方式</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">SM2</td>
+                            <td>多机通信控制位</td>
+                            <td>多机通信时使用，通常设为0</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">REN</td>
+                            <td>接收使能位</td>
+                            <td>1=允许接收，0=禁止接收</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">TB8</td>
+                            <td>发送位8</td>
+                            <td>在方式2和3中，是要发送的第9位数据</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">RB8</td>
+                            <td>接收位8</td>
+                            <td>在方式2和3中，是接收到的第9位数据</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">TI</td>
+                            <td>发送中断标志</td>
+                            <td>发送完成时硬件置1，需软件清零</td>
+                        </tr>
+                        <tr>
+                            <td class="bit-highlight">RI</td>
+                            <td>接收中断标志</td>
+                            <td>接收完成时硬件置1，需软件清零</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="scon-example">
+                        <div class="scon-example-title">示例：设置SCON寄存器</div>
+                        <p>SCON = 0x50; // 二进制 01010000</p>
+                        <p>这表示：SM0=0, SM1=1 (方式1), SM2=0, REN=1 (允许接收), TB8=0, RB8=0, TI=0, RI=0</p>
+                    </div>
+                    
+                    <div class="case-study">
+                        <div class="case-title">💡 小提示</div>
+                        <p>设置SCON = 0x50，表示选择方式1并允许接收。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-init">
+                <div class="card-header">
+                    <div class="card-icon">🔧</div>
+                    <h2 class="card-title">串口初始化步骤</h2>
+                </div>
+                <div class="card-content">
+                    <ol>
+                        <li>确定定时器工作方式（TMOD）</li>
+                        <li>计算定时器初值（设置波特率）</li>
+                        <li>启动定时器（TR1）</li>
+                        <li>设置串口工作方式（SCON）</li>
+                        <li>开启串口中断（如需中断方式）</li>
+                        <li>开启总中断（EA）</li>
+                    </ol>
+                    
+                    <div class="case-study">
+                        <div class="case-title">🏠 实际案例</div>
+                        <p>你的智能小车通过串口接收手机APP发送的控制指令，控制电机转动。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-send-receive">
+                <div class="card-header">
+                    <div class="card-icon">📨</div>
+                    <h2 class="card-title">数据发送与接收</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>发送数据：</strong></p>
+                    <p>将数据写入SBUF寄存器，硬件自动按设定格式发送</p>
+                    
+                    <p><strong>接收数据：</strong></p>
+                    <p>硬件自动接收数据并存入SBUF，通过RI标志通知程序</p>
+                    
+                    <div class="interactive-controls">
+                        <button class="btn" onclick="sendData()">发送数据 'A'</button>
+                        <button class="btn" onclick="toggleLED()">切换LED状态</button>
+                    </div>
+                    
+                    <div class="led-demo">
+                        <div class="led off" id="led"></div>
+                        <p>LED状态: <span id="led-status">关闭</span></p>
+                    </div>
+                    
+                    <div id="send-status" class="status-message">点击按钮模拟数据发送</div>
+                </div>
+            </div>
+            
+            <div class="card card-baudrate">
+                <div class="card-header">
+                    <div class="card-icon">🧮</div>
+                    <h2 class="card-title">波特率计算</h2>
+                </div>
+                <div class="card-content">
+                    <p>常用波特率：9600、19200、115200等</p>
+                    <p>公式：<span class="highlight">波特率 = (2^SMOD × 晶振频率) / (32 × 12 × (256 - TH1))</span></p>
+                    <p>例如：11.0592MHz晶振，SMOD=0，9600波特率时：</p>
+                    <p>TH1 = 256 - 11059200/(384 × 9600) = 253 (0xFD)</p>
+                    
+                    <div class="case-study">
+                        <div class="case-title">📡 实际案例</div>
+                        <p>你的蓝牙模块与51单片机通过串口通信，实现手机与单片机的数据传输。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">🔬 串口通信动画演示</h2>
+            <div class="demo-container">
+                <div class="interactive-controls">
+                    <button class="btn" onclick="startAnimation()">开始传输</button>
+                    <button class="btn" onclick="stopAnimation()">停止传输</button>
+                    <button class="btn" onclick="resetAnimation()">重置动画</button>
+                </div>
+                
+                <div id="animation-status" class="status-message">点击"开始传输"按钮启动串口通信动画</div>
+                
+                <div class="serial-animation" id="serial-animation">
+                    <div class="data-packet">A</div>
+                    <div class="data-packet">B</div>
+                    <div class="data-packet">C</div>
+                    <div class="data-packet">1</div>
+                    <div class="data-packet">2</div>
+                </div>
+                
+                <div class="code-example">
+                    <pre><code><span class="code-comment">// 51单片机串口初始化代码示例</span>
+<span class="code-comment">// 设置串口工作方式1，波特率9600</span>
+<span class="code-keyword">void</span> <span class="code-function">UART_Init</span>() {
+    SCON = <span class="code-value">0x50</span>;        <span class="code-comment">// 串口方式1，允许接收</span>
+    TMOD = <span class="code-value">0x20</span>;        <span class="code-comment">// 定时器1方式2</span>
+    TH1 = <span class="code-value">0xFD</span>;         <span class="code-comment">// 波特率9600</span>
+    TL1 = <span class="code-value">0xFD</span>;
+    TR1 = <span class="code-value">1</span>;            <span class="code-comment">// 启动定时器1</span>
+    EA = <span class="code-value">1</span>;             <span class="code-comment">// 开启总中断</span>
+    ES = <span class="code-value">1</span>;             <span class="code-comment">// 开启串口中断</span>
+}
+
+<span class="code-comment">// 发送一个字符</span>
+<span class="code-keyword">void</span> <span class="code-function">UART_SendByte</span>(<span class="code-keyword">unsigned</span> <span class="code-keyword">char</span> dat) {
+    SBUF = dat;
+    <span class="code-keyword">while</span>(!TI);          <span class="code-comment">// 等待发送完成</span>
+    TI = <span class="code-value">0</span>;              <span class="code-comment">// 清除发送中断标志</span>
+}
+
+<span class="code-comment">// 串口中断服务函数</span>
+<span class="code-keyword">void</span> <span class="code-function">UART_ISR</span>() <span class="code-keyword">interrupt</span> <span class="code-value">4</span> {
+    <span class="code-keyword">if</span>(RI) {
+        RI = <span class="code-value">0</span>;          <span class="code-comment">// 清除接收中断标志</span>
+        <span class="code-comment">// 处理接收到的数据: SBUF</span>
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 51单片机串口通信知识卡片 | 专为零基础学习者设计</p>
+        </footer>
+    </div>
+
+    <script>
+        // 初始化动画状态
+        let animationRunning = false;
+        let frameAnimationRunning = false;
+        
+        // 波特率控制
+        function changeBaudRate(rate) {
+            document.getElementById('baud-rate-display').textContent = '当前波特率: ' + rate;
+            document.getElementById('baud-rate-display').style.backgroundColor = '#d4edda';
+            document.getElementById('baud-rate-display').style.color = '#155724';
+            setTimeout(() => {
+                document.getElementById('baud-rate-display').style.backgroundColor = '#e8f4f8';
+                document.getElementById('baud-rate-display').style.color = '#0077b6';
+            }, 1000);
+        }
+        
+        // LED控制
+        function toggleLED() {
+            const led = document.getElementById('led');
+            const status = document.getElementById('led-status');
+            const sendStatus = document.getElementById('send-status');
+            
+            if (led.classList.contains('off')) {
+                led.classList.remove('off');
+                led.classList.add('on');
+                status.textContent = '开启';
+                sendStatus.textContent = 'LED已开启！这模拟了通过串口发送指令控制外部设备的过程。';
+            } else {
+                led.classList.remove('on');
+                led.classList.add('off');
+                status.textContent = '关闭';
+                sendStatus.textContent = 'LED已关闭！';
+            }
+            
+            sendStatus.style.backgroundColor = '#d4edda';
+            sendStatus.style.color = '#155724';
+            setTimeout(() => {
+                sendStatus.style.backgroundColor = '#e8f4f8';
+                sendStatus.style.color = '#0077b6';
+            }, 2000);
+        }
+        
+        // 发送数据
+        function sendData() {
+            const sendStatus = document.getElementById('send-status');
+            sendStatus.textContent = '通过串口发送数据: A (ASCII: 65)。数据被写入SBUF寄存器后，硬件会自动将其转换为串行数据发送出去。';
+            sendStatus.style.backgroundColor = '#d4edda';
+            sendStatus.style.color = '#155724';
+            setTimeout(() => {
+                sendStatus.style.backgroundColor = '#e8f4f8';
+                sendStatus.style.color = '#0077b6';
+            }, 2000);
+        }
+        
+        // 发送串口数据
+        function sendSerialData() {
+            const serialStatus = document.getElementById('serial-status');
+            serialStatus.textContent = '模拟串口数据传输过程：数据逐位发送，接收方逐位接收并重组。就像把一句话拆成单个字一个一个说，对方再把这些字重新组合成完整的句子。';
+            serialStatus.style.backgroundColor = '#d4edda';
+            serialStatus.style.color = '#155724';
+            setTimeout(() => {
+                serialStatus.style.backgroundColor = '#e8f4f8';
+                serialStatus.style.color = '#0077b6';
+            }, 2000);
+        }
+        
+        // 动画控制
+        function startAnimation() {
+            if (!animationRunning) {
+                const packets = document.querySelectorAll('.data-packet');
+                packets.forEach((packet, index) => {
+                    packet.style.animation = `moveData 5s linear ${index}s infinite`;
+                });
+                animationRunning = true;
+                
+                const animationStatus = document.getElementById('animation-status');
+                animationStatus.textContent = '串口数据传输已开始！注意观察数据包是如何一个接一个传输的。';
+                animationStatus.style.backgroundColor = '#d4edda';
+                animationStatus.style.color = '#155724';
+                setTimeout(() => {
+                    animationStatus.style.backgroundColor = '#e8f4f8';
+                    animationStatus.style.color = '#0077b6';
+                }, 2000);
+            }
+        }
+        
+        function stopAnimation() {
+            if (animationRunning) {
+                const packets = document.querySelectorAll('.data-packet');
+                packets.forEach(packet => {
+                    packet.style.animationPlayState = 'paused';
+                });
+                animationRunning = false;
+                
+                const animationStatus = document.getElementById('animation-status');
+                animationStatus.textContent = '串口数据传输已暂停！';
+                animationStatus.style.backgroundColor = '#fff3cd';
+                animationStatus.style.color = '#856404';
+                setTimeout(() => {
+                    animationStatus.style.backgroundColor = '#e8f4f8';
+                    animationStatus.style.color = '#0077b6';
+                }, 2000);
+            }
+        }
+        
+        function resetAnimation() {
+            const packets = document.querySelectorAll('.data-packet');
+            packets.forEach(packet => {
+                packet.style.animation = 'none';
+                packet.style.left = '-60px';
+            });
+            setTimeout(() => {
+                packets.forEach((packet, index) => {
+                    packet.style.animation = `moveData 5s linear ${index}s infinite`;
+                    packet.style.animationPlayState = 'running';
+                });
+            }, 10);
+            animationRunning = true;
+            
+            const animationStatus = document.getElementById('animation-status');
+            animationStatus.textContent = '串口数据传输已重置！';
+            animationStatus.style.backgroundColor = '#d1ecf1';
+            animationStatus.style.color = '#0c5460';
+            setTimeout(() => {
+                animationStatus.style.backgroundColor = '#e8f4f8';
+                animationStatus.style.color = '#0077b6';
+            }, 2000);
+        }
+        
+        // 数据帧动画控制
+        function startFrameAnimation() {
+            if (!frameAnimationRunning) {
+                const frameStatus = document.getElementById('frame-status');
+                frameStatus.textContent = '数据帧传输中...注意观察起始位、数据位和停止位的传输顺序';
+                frameStatus.style.backgroundColor = '#d4edda';
+                frameStatus.style.color = '#155724';
+                
+                const bits = document.querySelectorAll('.frame-bit-moving');
+                const transmissionWidth = document.getElementById('frame-transmission').offsetWidth;
+                
+                bits.forEach((bit, index) => {
+                    bit.style.left = '-60px';
+                    setTimeout(() => {
+                        bit.style.transition = `left ${2 + index * 0.2}s linear`;
+                        bit.style.left = (transmissionWidth - 50) + 'px';
+                    }, index * 300);
+                });
+                
+                frameAnimationRunning = true;
+                
+                setTimeout(() => {
+                    frameStatus.textContent = '数据帧传输完成！';
+                    frameStatus.style.backgroundColor = '#d1ecf1';
+                    frameStatus.style.color = '#0c5460';
+                    frameAnimationRunning = false;
+                }, 5000);
+            }
+        }
+        
+        function resetFrameAnimation() {
+            const bits = document.querySelectorAll('.frame-bit-moving');
+            bits.forEach(bit => {
+                bit.style.transition = 'none';
+                bit.style.left = '-60px';
+            });
+            
+            const frameStatus = document.getElementById('frame-status');
+            frameStatus.textContent = '数据帧传输已重置，点击"开始帧传输"按钮重新开始';
+            frameStatus.style.backgroundColor = '#e8f4f8';
+            frameStatus.style.color = '#0077b6';
+            
+            frameAnimationRunning = false;
+        }
+        
+        // 页面加载完成后初始化
+        window.onload = function() {
+            // 初始化数据包位置
+            const packets = document.querySelectorAll('.data-packet');
+            packets.forEach(packet => {
+                packet.style.animation = 'none';
+                packet.style.left = '-60px';
+            });
+            
+            // 初始化帧动画位置
+            const bits = document.querySelectorAll('.frame-bit-moving');
+            bits.forEach(bit => {
+                bit.style.left = '-60px';
+            });
+        };
+    </script>
+</body>
+</html>

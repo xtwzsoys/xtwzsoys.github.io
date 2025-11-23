@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51单片机点阵显示知识卡片</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-out;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .learning-path {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .path-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 180px;
+        }
+        
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .step-text {
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .knowledge-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-top: 5px solid #3498db;
+        }
+        
+        .knowledge-card:nth-child(2) {
+            border-top-color: #2ecc71;
+        }
+        
+        .knowledge-card:nth-child(3) {
+            border-top-color: #e74c3c;
+        }
+        
+        .knowledge-card:nth-child(4) {
+            border-top-color: #f39c12;
+        }
+        
+        .knowledge-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #3498db;
+        }
+        
+        .card-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 15px;
+        }
+        
+        .card-content {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+        }
+        
+        .demo-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .demo-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        /* 8x8点阵部分样式 */
+        .explanation-8x8 {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #3498db;
+        }
+        
+        .demo-content-8x8 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .visualization-8x8 {
+            display: flex;
+            gap: 40px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .design-area, .preview-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .dot-matrix-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+        
+        .dot-matrix {
+            display: inline-block;
+            border: 3px solid #3498db;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dot-row {
+            display: flex;
+        }
+        
+        .dot {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: transparent;
+        }
+        
+        .dot:hover {
+            background: #f0f8ff;
+        }
+        
+        .dot.active {
+            background: #3498db;
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .dot.active.highlight {
+            background: #e74c3c;
+            transform: scale(1.1);
+        }
+        
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button.secondary {
+            background: #2ecc71;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        
+        button.secondary:hover {
+            background: #27ae60;
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        button.danger {
+            background: #e74c3c;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        button.danger:hover {
+            background: #c0392b;
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .pattern-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .code-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        .code-output code {
+            display: block;
+            line-height: 1.5;
+        }
+        
+        /* 16x16点阵部分样式 */
+        .expand-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .expand-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #f39c12, #e74c3c, #3498db);
+        }
+        
+        .explanation-16x16 {
+            background: linear-gradient(135deg, #fff3e0, #e8f5e9);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #f39c12;
+        }
+        
+        .demo-content-16x16 {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .chinese-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .matrix-comparison {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            gap: 30px;
+        }
+        
+        .matrix-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .matrix-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .matrix-title {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        
+        /* 16x16点阵缩小 */
+        .dot-matrix-16x16 .dot {
+            width: 25px;
+            height: 25px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-size: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #e17055;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .knowledge-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dot {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .dot-matrix-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .visualization-8x8 {
+                flex-direction: column;
+            }
+            
+            .learning-path {
+                gap: 15px;
+            }
+            
+            .path-step {
+                max-width: 140px;
+            }
+            
+            .step-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .dot-matrix-16x16 .dot {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-microchip"></i> 51单片机点阵显示</h1>
+            <p class="subtitle">从8x8简单图案到16x16汉字显示 - 零基础入门知识卡片</p>
+            
+            <div class="learning-path">
+                <div class="path-step">
+                    <div class="step-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="step-text">理解点阵原理</div>
+                </div>
+                <div class="path-step">
+                    <div class="step-icon"><i class="fas fa-edit"></i></div>
+                    <div class="step-text">设计8x8图案</div>
+                </div>
+                <div class="path-step">
+                    <div class="step-icon"><i class="fas fa-code"></i></div>
+                    <div class="step-text">生成单片机代码</div>
+                </div>
+                <div class="path-step">
+                    <div class="step-icon"><i class="fas fa-font"></i></div>
+                    <div class="step-text">扩展到16x16汉字</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="knowledge-grid">
+            <div class="knowledge-card">
+                <div class="card-icon"><i class="fas fa-th"></i></div>
+                <h2 class="card-title">点阵是什么？</h2>
+                <div class="card-content">
+                    <p>点阵就像电子画板，由排列整齐的LED灯组成。通过控制每个灯的亮灭，可以显示各种图案和文字。</p>
+                    <div class="highlight-box">
+                        <p><strong>核心概念：</strong> 点阵是由LED组成的网格，通过控制每个点的亮灭来显示信息。</p>
+                    </div>
+                    <p>8x8点阵有64个LED，适合显示简单图案和字符；16x16点阵有256个LED，可以显示更复杂的汉字。</p>
+                </div>
+            </div>
+            
+            <div class="knowledge-card">
+                <div class="card-icon"><i class="fas fa-microchip"></i></div>
+                <h2 class="card-title">单片机如何控制点阵？</h2>
+                <div class="card-content">
+                    <p>51单片机通过输出高电平(1)或低电平(0)来控制LED的亮灭。</p>
+                    <div class="highlight-box">
+                        <p><strong>核心概念：</strong> 单片机通过I/O口输出控制信号，点亮或熄灭LED。</p>
+                    </div>
+                    <p>由于引脚有限，采用扫描方式：逐行快速点亮，利用人眼视觉暂留效应形成完整图像。</p>
+                    <p>扫描频率通常为50-100Hz，太低会闪烁，太高会增加单片机负担。</p>
+                </div>
+            </div>
+            
+            <div class="knowledge-card">
+                <div class="card-icon"><i class="fas fa-database"></i></div>
+                <h2 class="card-title">数据编码原理</h2>
+                <div class="card-content">
+                    <p>每个图案在点阵中都有对应的"编码"。</p>
+                    <div class="highlight-box">
+                        <p><strong>核心概念：</strong> 点阵图案可以转换为二进制数据存储在程序中。</p>
+                    </div>
+                    <p>8x8点阵可以用8个字节表示，每个字节控制一行的8个点。</p>
+                    <p>16x16点阵需要32个字节，每行用2个字节表示。</p>
+                    <p>可以使用取模软件自动生成汉字点阵数据。</p>
+                </div>
+            </div>
+            
+            <div class="knowledge-card">
+                <div class="card-icon"><i class="fas fa-cogs"></i></div>
+                <h2 class="card-title">编程实现步骤</h2>
+                <div class="card-content">
+                    <ol>
+                        <li>获取点阵数据（手动设计或使用取模软件）</li>
+                        <li>设置单片机的I/O口工作模式</li>
+                        <li>编写扫描显示程序</li>
+                        <li>调试优化显示效果</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <p><strong>核心概念：</strong> 点阵显示是通过循环扫描每一行实现的。</p>
+                    </div>
+                    <p>可以添加移位、闪烁等特效增加趣味性。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2 class="demo-title"><i class="fas fa-pencil-alt"></i> 8x8点阵 - 自定义图案设计</h2>
+            <p class="demo-subtitle">点击下方点阵中的小方块来设计你的图案，然后查看生成的单片机代码</p>
+            
+            <div class="explanation-8x8">
+                <h3><i class="fas fa-info-circle"></i> 设计说明</h3>
+                <p>每个小方块代表一个LED灯，<strong>点击可以切换其状态（点亮或熄灭）</strong>。</p>
+                <p><strong>左侧设计区域</strong>用于创建你的图案，<strong>右侧预览区域</strong>会实时显示设计效果。</p>
+                <p>点击"生成代码"按钮后，将显示对应的C语言代码，你可以直接用于51单片机项目。</p>
+                <p>代码包括点阵数据数组和显示函数，采用行扫描方式显示。</p>
+                <p>点击"扫描演示"按钮可以看到单片机是如何逐行扫描显示点阵的。</p>
+            </div>
+            
+            <div class="demo-content-8x8">
+                <div class="visualization-8x8">
+                    <div class="design-area">
+                        <h3><i class="fas fa-palette"></i> 设计区域</h3>
+                        <div class="dot-matrix" id="dotMatrix8x8">
+                            <!-- 8x8点阵将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="preview-area">
+                        <h3><i class="fas fa-eye"></i> 预览区域</h3>
+                        <div class="dot-matrix" id="preview8x8">
+                            <!-- 预览点阵将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="clearBtn"><i class="fas fa-eraser"></i> 清空设计</button>
+                    <button id="generateCode" class="secondary"><i class="fas fa-code"></i> 生成代码</button>
+                    <button id="scanDemo8x8"><i class="fas fa-play"></i> 扫描演示</button>
+                </div>
+                
+                <div class="pattern-buttons">
+                    <button class="pattern-btn" data-pattern="smile"><i class="far fa-smile"></i> 笑脸</button>
+                    <button class="pattern-btn" data-pattern="heart"><i class="fas fa-heart"></i> 心形</button>
+                    <button class="pattern-btn" data-pattern="arrow"><i class="fas fa-arrow-up"></i> 箭头</button>
+                    <button class="pattern-btn" data-pattern="check"><i class="fas fa-check"></i> 对勾</button>
+                </div>
+                
+                <div class="code-output" id="codeOutput">
+                    <code>// 生成的代码将显示在这里</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="expand-section">
+            <h2 class="demo-title"><i class="fas fa-expand-arrows-alt"></i> 扩展到16x16点阵 - 汉字显示</h2>
+            <p class="demo-subtitle">16x16点阵可以显示完整的汉字，下面是"中"字的显示演示</p>
+            
+            <div class="explanation-16x16">
+                <h3><i class="fas fa-font"></i> 汉字显示原理</h3>
+                <p>汉字比英文字符复杂，需要更多的点来显示细节。</p>
+                <p><strong>16x16点阵用32个字节表示一个汉字，每行用2个字节（16位）表示。</strong></p>
+                <p>汉字点阵数据通常存储在程序中，通过查表方式显示。</p>
+                <p>可以使用专门的取模软件获取汉字的点阵数据，或从标准字库中提取。</p>
+            </div>
+            
+            <div class="demo-content-16x16">
+                <div class="chinese-display">
+                    <h3><i class="fas fa-font"></i> 汉字显示演示</h3>
+                    <div class="dot-matrix dot-matrix-16x16" id="dotMatrix16x16">
+                        <!-- 16x16点阵将通过JavaScript生成 -->
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="showChar"><i class="fas fa-font"></i> 显示"中"字</button>
+                        <button id="clearMatrix16" class="danger"><i class="fas fa-trash"></i> 清空</button>
+                        <button id="scanDemo16"><i class="fas fa-play"></i> 扫描演示</button>
+                    </div>
+                    
+                    <div class="code-output" id="chineseCode">
+                        <code>// 汉字点阵数据将显示在这里</code>
+                    </div>
+                </div>
+                
+                <div class="matrix-comparison">
+                    <div class="matrix-item">
+                        <div class="matrix-title">8x8点阵</div>
+                        <div class="dot-matrix" id="comparison8x8">
+                            <!-- 8x8点阵将通过JavaScript生成 -->
+                        </div>
+                        <p><strong>64个点</strong></p>
+                        <p>适合简单图案</p>
+                    </div>
+                    
+                    <div class="matrix-item">
+                        <div class="matrix-title">16x16点阵</div>
+                        <div class="dot-matrix dot-matrix-16x16" id="comparison16x16">
+                            <!-- 16x16点阵将通过JavaScript生成 -->
+                        </div>
+                        <p><strong>256个点</strong></p>
+                        <p>适合显示汉字</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><i class="far fa-copyright"></i> 2023 51单片机学习卡片 | 从8x8到16x16点阵显示原理教学</p>
+            <p style="margin-top: 10px;">设计用于零基础学习者理解单片机点阵显示原理</p>
+        </footer>
+    </div>
+
+    <script>
+        // 初始化对比点阵
+        function initComparisonMatrices() {
+            // 8x8对比点阵
+            const comparison8x8 = document.getElementById('comparison8x8');
+            comparison8x8.innerHTML = '';
+            
+            for (let i = 0; i < 8; i++) {
+                const row = document.createElement('div');
+                row.className = 'dot-row';
+                
+                for (let j = 0; j < 8; j++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if (i === 0 || i === 7 || j === 0 || j === 7 || (i === j) || (i + j === 7)) {
+                        dot.classList.add('active');
+                    }
+                    row.appendChild(dot);
+                }
+                
+                comparison8x8.appendChild(row);
+            }
+            
+            // 16x16对比点阵
+            const comparison16x16 = document.getElementById('comparison16x16');
+            comparison16x16.innerHTML = '';
+            
+            for (let i = 0; i < 16; i++) {
+                const row = document.createElement('div');
+                row.className = 'dot-row';
+                
+                for (let j = 0; j < 16; j++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if (i === 0 || i === 15 || j === 0 || j === 15 || 
+                        (i >= 5 && i <= 10 && j >= 5 && j <= 10)) {
+                        dot.classList.add('active');
+                    }
+                    row.appendChild(dot);
+                }
+                
+                comparison16x16.appendChild(row);
+            }
+        }
+        
+        // 8x8点阵数据
+        let matrix8x8 = [];
+        let preview8x8 = [];
+        
+        // 初始化8x8点阵
+        function init8x8Matrix() {
+            const dotMatrix8x8 = document.getElementById('dotMatrix8x8');
+            const previewMatrix = document.getElementById('preview8x8');
+            
+            dotMatrix8x8.innerHTML = '';
+            previewMatrix.innerHTML = '';
+            matrix8x8 = [];
+            preview8x8 = [];
+            
+            for (let i = 0; i < 8; i++) {
+                const row = document.createElement('div');
+                row.className = 'dot-row';
+                matrix8x8[i] = [];
+                
+                const previewRow = document.createElement('div');
+                previewRow.className = 'dot-row';
+                preview8x8[i] = [];
+                
+                for (let j = 0; j < 8; j++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.dataset.row = i;
+                    dot.dataset.col = j;
+                    dot.addEventListener('click', toggleDot);
+                    row.appendChild(dot);
+                    matrix8x8[i][j] = dot;
+                    
+                    const previewDot = document.createElement('div');
+                    previewDot.className = 'dot';
+                    previewRow.appendChild(previewDot);
+                    preview8x8[i][j] = previewDot;
+                }
+                
+                dotMatrix8x8.appendChild(row);
+                previewMatrix.appendChild(previewRow);
+            }
+        }
+        
+        // 切换点的状态
+        function toggleDot(event) {
+            const dot = event.target;
+            dot.classList.toggle('active');
+            updatePreview();
+        }
+        
+        // 更新预览
+        function updatePreview() {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if (matrix8x8[i][j].classList.contains('active')) {
+                        preview8x8[i][j].classList.add('active');
+                    } else {
+                        preview8x8[i][j].classList.remove('active');
+                    }
+                }
+            }
+        }
+        
+        // 清空8x8点阵
+        function clear8x8Matrix() {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    matrix8x8[i][j].classList.remove('active');
+                    preview8x8[i][j].classList.remove('active');
+                }
+            }
+        }
+        
+        // 生成代码
+        function generateCode() {
+            let code = "// 8x8点阵数据 - 按行存储\n";
+            code += "unsigned char code pattern[8] = {";
+            
+            for (let i = 0; i < 8; i++) {
+                let byte = 0;
+                for (let j = 0; j < 8; j++) {
+                    if (matrix8x8[i][j].classList.contains('active')) {
+                        byte |= (1 << (7 - j));
+                    }
+                }
+                code += " 0x" + byte.toString(16).padStart(2, '0');
+                if (i < 7) code += ",";
+            }
+            
+            code += " };\n\n";
+            code += "// 显示函数\n";
+            code += "void displayPattern() {\n";
+            code += "  for(int row=0; row<8; row++) {\n";
+            code += "    P2 = ~(1 << row);        // 选择行\n";
+            code += "    P0 = ~pattern[row];      // 设置列数据\n";
+            code += "    delay(1);                // 短暂延时\n";
+            code += "  }\n";
+            code += "}";
+            
+            document.getElementById('codeOutput').innerHTML = "<code>" + code + "</code>";
+        }
+        
+        // 8x8扫描演示
+        function scanDemo8x8() {
+            clearHighlights8x8();
+            let row = 0;
+            
+            const scanInterval = setInterval(() => {
+                clearHighlights8x8();
+                
+                // 显示当前扫描行
+                for (let col = 0; col < 8; col++) {
+                    preview8x8[row][col].classList.add('highlight');
+                }
+                
+                // 显示已经扫描过的部分
+                for (let i = 0; i <= row; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        if (matrix8x8[i][j].classList.contains('active')) {
+                            preview8x8[i][j].classList.add('active');
+                        }
+                    }
+                }
+                
+                row++;
+                if (row >= 8) {
+                    clearInterval(scanInterval);
+                    setTimeout(() => {
+                        clearHighlights8x8();
+                        updatePreview();
+                    }, 500);
+                }
+            }, 300);
+        }
+        
+        // 清除8x8高亮
+        function clearHighlights8x8() {
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 8; j++) {
+                    preview8x8[i][j].classList.remove('highlight');
+                    preview8x8[i][j].classList.remove('active');
+                }
+            }
+        }
+        
+        // 预定义图案
+        const patterns = {
+            smile: [
+                0x3C, 0x42, 0xA5, 0x81, 0xA5, 0x99, 0x42, 0x3C
+            ],
+            heart: [
+                0x0E, 0x1F, 0x3F, 0x7E, 0x7E, 0x3F, 0x1F, 0x0E
+            ],
+            arrow: [
+                0x08, 0x0C, 0xFE, 0xFF, 0xFE, 0x0C, 0x08, 0x00
+            ],
+            check: [
+                0x01, 0x03, 0x06, 0x8C, 0xD8, 0x70, 0x20, 0x00
+            ]
+        };
+        
+        // 应用预定义图案
+        function applyPattern(patternName) {
+            clear8x8Matrix();
+            const pattern = patterns[patternName];
+            
+            for (let i = 0; i < 8; i++) {
+                const byte = pattern[i];
+                for (let j = 0; j < 8; j++) {
+                    if (byte & (1 << (7 - j))) {
+                        matrix8x8[i][j].classList.add('active');
+                    }
+                }
+            }
+            updatePreview();
+        }
+        
+        // 16x16点阵相关函数
+        let matrix16x16 = [];
+        
+        // 初始化16x16点阵
+        function init16x16Matrix() {
+            const dotMatrix16x16 = document.getElementById('dotMatrix16x16');
+            dotMatrix16x16.innerHTML = '';
+            matrix16x16 = [];
+            
+            for (let i = 0; i < 16; i++) {
+                const row = document.createElement('div');
+                row.className = 'dot-row';
+                matrix16x16[i] = [];
+                
+                for (let j = 0; j < 16; j++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.dataset.row = i;
+                    dot.dataset.col = j;
+                    row.appendChild(dot);
+                    matrix16x16[i][j] = dot;
+                }
+                
+                dotMatrix16x16.appendChild(row);
+            }
+        }
+        
+        // 修正后的"中"字的16x16点阵数据
+        const zhongCharData = [
+            0x00, 0x00, 0x00, 0x00, 0x03, 0x80, 0x04, 0x40,
+            0x08, 0x20, 0x10, 0x10, 0x20, 0x08, 0x4F, 0xE4,
+            0x88, 0x22, 0x08, 0x20, 0x08, 0x20, 0x08, 0x20,
+            0x08, 0x20, 0x08, 0x20, 0x00, 0x00, 0x00, 0x00
+        ];
+        
+        // 显示"中"字
+        function showZhongChar() {
+            clearHighlights16x16();
+            
+            for (let i = 0; i < 16; i++) {
+                const byte1 = zhongCharData[i * 2];
+                const byte2 = zhongCharData[i * 2 + 1];
+                
+                for (let j = 0; j < 8; j++) {
+                    if (byte1 & (1 << (7 - j))) {
+                        matrix16x16[i][j].classList.add('active');
+                    }
+                }
+                
+                for (let j = 0; j < 8; j++) {
+                    if (byte2 & (1 << (7 - j))) {
+                        matrix16x16[i][j + 8].classList.add('active');
+                    }
+                }
+            }
+            
+            // 显示汉字代码
+            let code = "// '中'字16x16点阵数据\n";
+            code += "unsigned char code zhong[32] = {\n";
+            for (let i = 0; i < 32; i++) {
+                code += "  0x" + zhongCharData[i].toString(16).padStart(2, '0');
+                if (i < 31) code += ",";
+                if ((i + 1) % 8 === 0) code += "\n";
+            }
+            code += "};";
+            
+            document.getElementById('chineseCode').innerHTML = "<code>" + code + "</code>";
+        }
+        
+        // 清空16x16点阵
+        function clearMatrix16() {
+            clearHighlights16x16();
+            for (let i = 0; i < 16; i++) {
+                for (let j = 0; j < 16; j++) {
+                    matrix16x16[i][j].classList.remove('active');
+                }
+            }
+            document.getElementById('chineseCode').innerHTML = "<code>// 汉字点阵数据将显示在这里</code>";
+        }
+        
+        // 清除16x16高亮
+        function clearHighlights16x16() {
+            for (let i = 0; i < 16; i++) {
+                for (let j = 0; j < 16; j++) {
+                    matrix16x16[i][j].classList.remove('highlight');
+                }
+            }
+        }
+        
+        // 16x16扫描演示
+        function scanDemo16() {
+            clearMatrix16();
+            let row = 0;
+            
+            const scanInterval = setInterval(() => {
+                clearHighlights16x16();
+                
+                // 显示当前扫描行
+                for (let col = 0; col < 16; col++) {
+                    matrix16x16[row][col].classList.add('highlight');
+                }
+                
+                // 显示"中"字已经扫描过的部分
+                for (let i = 0; i <= row; i++) {
+                    const byte1 = zhongCharData[i * 2];
+                    const byte2 = zhongCharData[i * 2 + 1];
+                    
+                    for (let j = 0; j < 8; j++) {
+                        if (byte1 & (1 << (7 - j))) {
+                            matrix16x16[i][j].classList.add('active');
+                        }
+                    }
+                    
+                    for (let j = 0; j < 8; j++) {
+                        if (byte2 & (1 << (7 - j))) {
+                            matrix16x16[i][j + 8].classList.add('active');
+                        }
+                    }
+                }
+                
+                row++;
+                if (row >= 16) {
+                    clearInterval(scanInterval);
+                    setTimeout(() => {
+                        clearHighlights16x16();
+                        showZhongChar();
+                    }, 500);
+                }
+            }, 200);
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initComparisonMatrices();
+            init8x8Matrix();
+            init16x16Matrix();
+            
+            // 8x8点阵事件监听
+            document.getElementById('clearBtn').addEventListener('click', clear8x8Matrix);
+            document.getElementById('generateCode').addEventListener('click', generateCode);
+            document.getElementById('scanDemo8x8').addEventListener('click', scanDemo8x8);
+            
+            // 16x16点阵事件监听
+            document.getElementById('showChar').addEventListener('click', showZhongChar);
+            document.getElementById('clearMatrix16').addEventListener('click', clearMatrix16);
+            document.getElementById('scanDemo16').addEventListener('click', scanDemo16);
+            
+            // 预定义图案按钮事件
+            document.querySelectorAll('.pattern-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    applyPattern(this.dataset.pattern);
+                });
+            });
+            
+            // 初始显示提示动画
+            setTimeout(() => {
+                document.querySelector('header').classList.add('pulse');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

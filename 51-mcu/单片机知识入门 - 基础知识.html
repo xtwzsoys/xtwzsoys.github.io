@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零基础单片机入门：从认识到实现流水灯</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", "Arial", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin: 25px 0 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        h2::before {
+            content: "🔹";
+            margin-right: 8px;
+        }
+        h3 {
+            color: #34495e;
+            margin: 20px 0 12px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        h3::before {
+            content: "🔸";
+            margin-right: 8px;
+        }
+        p {
+            margin-bottom: 15px;
+            text-indent: 2em;
+        }
+        ul {
+            margin: 0 0 15px 40px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: "Consolas", monospace;
+            color: #e74c3c;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        pre code {
+            color: #333;
+            padding: 0;
+        }
+        .icon-box {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .icon-box span {
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>零基础单片机入门：从认识到实现流水灯</h1>
+
+    <!-- 第一部分：初识单片机 -->
+    <h2>一、初识单片机：掀开“微型控制大脑”的面纱</h2>
+    
+    <h3>1. 什么是单片机？—— 一个芯片搞定“简单控制”</h3>
+    <div class="icon-box">
+        <span>💡</span>
+        <span>核心类比：超迷你的“专用计算机”</span>
+    </div>
+    <p>你可以把单片机理解成“超迷你的计算机”，但它不像电脑能玩游戏、看视频，专门负责“简单的控制任务”。比如智能手环计步、家电遥控器发送指令、充电宝显示电量，背后都是一个小小的单片机在工作——<strong>一个芯片就能实现“接收信号→计算→控制设备”的完整流程</strong>，相当于设备的“微型大脑”。</p>
+
+    <h3>2. 主流单片机：不同场景选“不同工具”</h3>
+    <div class="icon-box">
+        <span>🔧</span>
+        <span>工具清单：4种常用单片机及用途</span>
+    </div>
+    <p>就像做饭有炒锅、汤锅，不同单片机适合不同任务，新手先记清特点和用途：</p>
+    <ul>
+        <li><strong>51单片机</strong>：入门“小白机”📚，结构简单、价格便宜，适合练手（比如做流水灯、按键控制）；</li>
+        <li><strong>STM32</strong>：“全能选手”🚀，功能强（能处理复杂数据、接传感器），适合做无人机、智能小车等复杂项目；</li>
+        <li><strong>Arduino</strong>：“创客神器”🔧，自带很多现成模块，不用写复杂代码，插线就能用（比如做智能花盆浇水）；</li>
+        <li><strong>PIC单片机</strong>：“工业常客”🏭，稳定性高，常用在洗衣机、空调等家电的控制板上。</li>
+    </ul>
+
+    <h3>3. 51单片机型号：像解读身份证一样拆含义</h3>
+    <div class="icon-box">
+        <span>🆔</span>
+        <span>型号拆解：以 STC89C516RD+ 为例</span>
+    </div>
+    <p>选经典型号<strong>STC89C516RD+</strong>，每部分都有“专属含义”：</p>
+    <ul>
+        <li><strong>STC</strong>：厂商（就像身份证上的“出生地”，这里是宏晶科技）；</li>
+        <li><strong>89C</strong>：芯片系列（类似“民族”，代表这是STC的89C系列，属于基础款）；</li>
+        <li><strong>51</strong>：核心架构（像“国籍”，说明它是“51架构”的单片机，新手学的就是这个架构）；</li>
+        <li><strong>6</strong>：存储容量（相当于“钱包大小”，这里指程序存储区是6KB，能装更大的程序）；</li>
+        <li><strong>RD+</strong>：附加特性（比如“支持高速下载”“低功耗”，不用深纠，知道是额外功能就行）。</li>
+    </ul>
+
+    <h3>4. 51单片机内部结构：用“房子布局”理解</h3>
+    <div class="icon-box">
+        <span>🏠</span>
+        <span>结构类比：3个核心“房间”各有分工</span>
+    </div>
+    <p>把单片机想象成“小房子”，内部有3个核心“房间”，各有分工：</p>
+    <ul>
+        <li><strong>CPU（大脑房）</strong>：负责“思考和指挥”🧠，比如接收按键信号后，计算“该点亮哪个LED”；</li>
+        <li><strong>存储器（衣柜房）</strong>：分两部分——“程序存储器”（存你写的控制代码，像衣柜存衣服👕）、“数据存储器”（存临时数据，比如LED点亮的次数，像抽屉放临时用的东西）；</li>
+        <li><strong>I/O口（门窗）</strong>：负责“和外部设备沟通”🚪，比如通过I/O口给LED发“点亮”信号，或通过I/O口接收按键的“按下”信号（相当于房子的门用来进出门，窗用来传东西）。</li>
+    </ul>
+
+
+    <!-- 第二部分：流水灯硬件设计 -->
+    <h2>二、流水灯硬件设计：像搭积木一样拼电路</h2>
+
+    <h3>1. 单片机引脚：认识“插针的作用”</h3>
+    <div class="icon-box">
+        <span>🖇️</span>
+        <span>引脚分类：3类关键插针记清楚</span>
+    </div>
+    <p>51单片机常见的是<strong>DIP40直插封装</strong>（就是有40根金属“插针”的芯片，能插在面包板上），重点记3类引脚：</p>
+    <ul>
+        <li><strong>电源引脚（VCC/GND）</strong>：VCC是“接电口”🔌（像手机充电口，接5V电源），GND是“接地口”⚡（像家电的地线，保证电路安全，必须接）；</li>
+        <li><strong>I/O引脚（比如P0、P1口）</strong>：“连接外部元件的接口”🔗（像手机的充电口、耳机孔），比如P1口接LED，P3口接按键；</li>
+        <li><strong>复位/时钟引脚</strong>：不用记具体位置，知道是“维持单片机工作的辅助接口”就行（后面讲最小系统会说）。</li>
+    </ul>
+
+    <h3>2. 单片机最小系统：“生存必备四件套”</h3>
+    <div class="icon-box">
+        <span>🛠️</span>
+        <span>核心组成：单片机工作的“基础保障”</span>
+    </div>
+    <p>单片机要工作，得有“最小生存环境”，就像人要活着需要“空气、水、食物”，最小系统必须有4部分：</p>
+    <ol>
+        <li><strong>单片机芯片</strong>：核心“大脑”🧠（没它一切免谈）；</li>
+        <li><strong>电源电路</strong>：给芯片供电🔌（接5V电源和GND，像给手机插充电器）；</li>
+        <li><strong>复位电路</strong>：“重启键”🔄（比如单片机卡顿时，按复位键让它重新开始工作，像电脑的重启按钮）；</li>
+        <li><strong>时钟电路</strong>：“心跳节奏”❤️（给单片机提供“时间基准”，比如让它每1毫秒做一次判断，像人的心跳维持身体运作）。</li>
+    </ol>
+    <div class="note">
+        <strong>简单示意图</strong>：芯片VCC接5V，GND接地；复位引脚接一个电阻和电容到GND；时钟引脚接两个电容和一个晶振（像“小闹钟”⏰）。
+    </div>
+
+    <h3>3. 并行I/O口：P0口——需要“稳定器”的通道</h3>
+    <div class="icon-box">
+        <span>🚦</span>
+        <span>P0口特点：必须外接“稳定器”</span>
+    </div>
+    <p>“并行I/O口”就是单片机“同时传多个数据的通道”（比如一次传8个信号控制8个LED），P0口是其中一个通道，但有个小特点：</p>
+    <ul>
+        <li><strong>功能</strong>：能“输出”（比如给LED发点亮信号），也能“输入”（比如读按键是否按下）；</li>
+        <li><strong>关键注意</strong>：P0口“需要外接上拉电阻”才能稳定工作（上拉电阻就像给通道加“稳定器”⚖️，没有的话信号会忽强忽弱，LED可能闪个不停）。</li>
+    </ul>
+
+    <h3>4. 并行I/O口：P1-P3口——自带“稳定器”的通道</h3>
+    <div class="icon-box">
+        <span>✅</span>
+        <span>P1-P3口特点：自带“稳定器”更省心</span>
+    </div>
+    <p>对比P0口，P1、P2、P3口更“省心”：</p>
+    <ul>
+        <li><strong>特点</strong>：内部自带“上拉电阻”，不用外接就能稳定工作（像买手机自带充电器🔌，不用额外买）；</li>
+        <li><strong>功能</strong>：和P0口一样，能输入也能输出，比如用P1口控制4个LED，直接接LED和电阻就行，不用多接上拉电阻。</li>
+    </ul>
+
+    <h3>5. 流水灯硬件电路：一步一步搭积木</h3>
+    <div class="icon-box">
+        <span>🧩</span>
+        <span>搭建步骤：4个LED流水灯电路</span>
+    </div>
+    <p>目标：让4个LED从左到右依次点亮（流水效果），电路组成像搭积木：</p>
+    <ol>
+        <li><strong>基础</strong>：先搭好“单片机最小系统”（保证单片机能工作）；</li>
+        <li><strong>接LED</strong>：每个LED的“正极”通过一个限流电阻（防止电流太大烧LED）接单片机的I/O口（比如P1.0、P1.1、P1.2、P1.3）；</li>
+        <li><strong>接地</strong>：所有LED的“负极”都接GND（单片机的接地引脚）。</li>
+    </ol>
+    <div class="note">
+        <strong>简单示意图</strong>：P1.0→电阻→LED正极→LED负极→GND；P1.1、P1.2、P1.3同理，四个LED并排接好。
+    </div>
+
+    <h3>6. 实训平台：新手不用自己搭电路</h3>
+    <div class="icon-box">
+        <span>📦</span>
+        <span>便捷工具：51单片机开发板</span>
+    </div>
+    <p>如果觉得自己搭电路麻烦，可以用<strong>51单片机开发板</strong>（现成的实训平台）：</p>
+    <ul>
+        <li>开发板上已经焊好了最小系统、LED模块、按键模块，还有电源接口；</li>
+        <li>你只要用杜邦线（像“小电线”🔌）把LED模块和单片机I/O口连起来，就能直接做实验，不用焊电路、查引脚，适合新手练手。</li>
+    </ul>
+
+    <h3>7. 单片机应用系统：硬件是“身体”，软件是“灵魂”</h3>
+    <div class="icon-box">
+        <span>👥</span>
+        <span>系统组成：硬件+软件缺一不可</span>
+    </div>
+    <p>完整的单片机项目（比如流水灯），必须有两部分：</p>
+    <ul>
+        <li><strong>硬件</strong>：单片机、LED、电阻、电路（相当于“身体”💪，是看得见摸得着的部分）；</li>
+        <li><strong>软件</strong>：控制程序（相当于“灵魂”🧠，告诉硬件“该做什么”，比如“让P1.0的LED亮1秒，再灭，然后P1.1的LED亮”）；</li>
+    </ul>
+    <div class="note">
+        只有硬件+软件结合，流水灯才能“流水”，缺一个都不行。
+    </div>
+
+
+    <!-- 第三部分：流水灯软件设计 -->
+    <h2>三、流水灯软件设计：用代码指挥硬件</h2>
+
+    <h3>1. 数据类型：装数据的“不同大小盒子”</h3>
+    <div class="icon-box">
+        <span>📦</span>
+        <span>类型类比：4种常用“数据盒子”</span>
+    </div>
+    <p>写程序时，要给数据“找个盒子装”，不同盒子能装的数值范围不一样：</p>
+    <ul>
+        <li><strong>unsigned char（无符号字符型）</strong>：“小盒子”📦，能装0-255的数（比如控制8个LED，用0-255的数就能表示所有LED的亮灭状态）；</li>
+        <li><strong>unsigned int（无符号整型）</strong>：“中盒子”📦，能装0-65535的数（比如记LED闪烁的次数，次数多了用小盒子装不下）；</li>
+        <li><strong>char（字符型）</strong>：能装-128到127的数（少用，新手先记前两个）；</li>
+        <li><strong>int（整型）</strong>：能装 - 32768 到 32767 的数（需要负数时用）。</li>
+    </ul>
+
+    <h3>2. 常量与变量：“固定的数”和“能变的数”</h3>
+    <div class="icon-box">
+        <span>🔢</span>
+        <span>概念区分：两种数据的不同用途</span>
+    </div>
+    <ul>
+        <li><strong>常量</strong>：固定不变的数，像你身份证上的生日🎂（比如“LED亮的时间1000毫秒”“电源电压5V”，程序运行时不会变）；
+            <br>例子：<code>#define DELAY_TIME 1000</code>（定义DELAY_TIME是1000，后面程序里用它代表1000）；
+        </li>
+        <li><strong>变量</strong>：能变的数，像你钱包里的钱💴（比如“记录LED点亮次数的count，每次点亮count加1”）；
+            <br>例子：<code>unsigned char count = 0;</code>（定义count是0，后面能改成1、2、3...）。
+        </li>
+    </ul>
+
+    <h3>3. 运算符：程序里的“计算和判断工具”</h3>
+    <div class="icon-box">
+        <span>➕➖✖️➗</span>
+        <span>常用运算符：4类核心工具</span>
+    </div>
+    <ul>
+        <li><strong>算术运算符</strong>：做加减乘除（+、-、*、/、%），比如：
+            <br><code>a = 5 + 3;</code>（a变成8，求5加3）；
+            <br><code>b = 10 % 3;</code>（b变成1，求10除以3的余数）；
+        </li>
+        <li><strong>关系运算符</strong>：判断两个数的关系（>、<、==、!=），比如：
+            <br><code>if (count > 10)</code>（判断count是不是大于10，满足就执行后面的操作）；
+        </li>
+        <li><strong>逻辑运算符</strong>：组合判断（&&“并且”、||“或者”、!“不是”），比如：
+            <br><code>if (count > 10 && LED == 1)</code>（count大于10“并且”LED是亮的，才执行操作）；
+        </li>
+        <li><strong>位运算符</strong>：操作二进制的“开关”（重点记左移<<、右移>>），比如：
+            <br><code>a = 1 << 1;</code>（1的二进制是0001，左移1位变成0010，a变成2）；
+            <br><code>a = 2 >> 1;</code>（2的二进制是0010，右移1位变成0001，a变成1）。
+        </li>
+    </ul>
+
+    <h3>4. 语句：程序里的“一句话和一段话”</h3>
+    <div class="icon-box">
+        <span>📝</span>
+        <span>语句分类：程序的基本执行单位</span>
+    </div>
+    <ul>
+        <li><strong>表达式语句</strong>：“一句话”，以分号结尾，是最小的执行单位，比如：
+            <br><code>LED = 0;</code>（让LED点亮，0代表低电平，点亮LED）；
+            <br><code>count = count + 1;</code>（count加1）；
+        </li>
+        <li><strong>复合语句</strong>：“一段话”，用大括号{}括起来，比如：
+            <br><code>if (count > 10) { LED = 1; count = 0; }</code>（如果count>10，就执行大括号里的两个操作：LED灭，count归0）。
+        </li>
+    </ul>
+
+    <h3>5. 循环语句：让程序“重复做事”</h3>
+    <div class="icon-box">
+        <span>🔄</span>
+        <span>两种循环：满足不同重复需求</span>
+    </div>
+    <ul>
+        <li><strong>for语句</strong>：先定规则，再重复（知道要重复多少次），结构：<code>for (初始化; 条件判断; 更新) {循环体}</code>；
+            <br>生活例子：“每天跑步30天”🏃——初始化（第一天开始）、条件判断（没到30天）、更新（每天加1天）、循环体（跑1小时）；
+            <br>程序例子（让LED闪烁10次）：
+            <pre><code>for (unsigned char i = 0; i < 10; i++) { // i从0开始，小于10就循环，每次i加1
+    LED = 0; // 点亮LED
+    delay(1000); // 等1秒
+    LED = 1; // 熄灭LED
+    delay(1000); // 等1秒
+}</code></pre>
+        </li>
+        <li><strong>while语句</strong>：先看条件，满足就一直做（不知道要重复多少次）；
+            <br>生活例子：“只要天没黑，就继续看书”📖——条件（天没黑）、循环体（看书）；
+            <br>程序例子（LED一直闪烁直到按键按下）：
+            <pre><code>while (key == 1) { // 只要按键没按下（key=1），就循环
+    LED = 0; 
+    delay(1000);
+    LED = 1;
+    delay(1000);
+}</code></pre>
+        </li>
+    </ul>
+
+    <h3>6. 左移流水灯程序：一步一步写代码</h3>
+    <div class="icon-box">
+        <span>💻</span>
+        <span>实战代码：5步实现流水效果</span>
+    </div>
+    <p>结合前面的知识点，写“4个LED从左到右流水”的代码，分5步：</p>
+    <ol>
+        <li><strong>定义引脚</strong>：告诉程序哪个I/O口控制LED（这里用P1口的P1.0-P1.3）：
+            <pre><code>sbit LED1 = P1^0; // LED1接P1.0
+sbit LED2 = P1^1; // LED2接P1.1
+sbit LED3 = P1^2; // LED3接P1.2
+sbit LED4 = P1^3; // LED4接P1.3</code></pre>
+        </li>
+        <li><strong>写延时函数</strong>：让LED亮灭有间隔（避免太快看不清）：
+            <pre><code>void delay(unsigned int time) { // time是延时时间，越大等越久
+    unsigned int i, j;
+    for (i = time; i > 0; i--)
+        for (j = 110; j > 0; j--);
+}</code></pre>
+        </li>
+        <li><strong>写主函数</strong>：程序的“入口”（所有程序从main开始执行）：
+            <pre><code>void main() {
+    while (1) { // 无限循环，让流水灯一直跑
+        // 第一步：点亮LED1，其他灭
+        LED1 = 0; LED2 = 1; LED3 = 1; LED4 = 1;
+        delay(1000); // 等1秒
+        
+        // 第二步：点亮LED2，其他灭（用左移简化，不用重复写）
+        P1 = 0xFE << 1; // 0xFE是11111110，左移1位变成11111101，P1.1变0（点亮LED2）
+        delay(1000);
+        
+        // 第三步：点亮LED3
+        P1 = 0xFE << 2; // 左移2位变成11111011，P1.2变0
+        delay(1000);
+        
+        // 第四步：点亮LED4
+        P1 = 0xFE << 3; // 左移3位变成11110111，P1.3变0
+        delay(1000);
+    }
+}</code></pre>
+        </li>
+        <li><strong>简化代码</strong>：用for循环代替重复的左移操作：
+            <pre><code>void main() {
+    unsigned char i;
+    while (1) {
+        for (i = 0; i < 4; i++) { // 循环4次，控制4个LED
+            P1 = ~(1 << i); // 1左移i位，再取反（比如i=0时，1<<0=1，~1=11111110，P1.0亮）
+            delay(1000);
+        }
+    }
+}</code></pre>
+        </li>
+        <li><strong>验证逻辑</strong>：代码的意思是“让P1口的某一个引脚变低电平（点亮对应LED），等1秒后换下个引脚，循环不止”，实现流水效果。</li>
+    </ol>
+
+
+    <!-- 第四部分：流水灯系统调试 -->
+    <h2>四、流水灯系统调试：把代码传到单片机里</h2>
+
+    <h3>1. 安装Keil软件：写代码的“记事本”</h3>
+    <div class="icon-box">
+        <span>📄</span>
+        <span>安装步骤：6步搞定Keil C51</span>
+    </div>
+    <p>Keil是单片机开发常用的“代码编辑和编译软件”，新手装<strong>Keil C51 V9.0</strong>版本，步骤：</p>
+    <ol>
+        <li>下载软件安装包（网上搜“Keil C51 V9.0 下载”，选正规资源）；</li>
+        <li>双击安装程序，点击“Next”，勾选“同意协议”；</li>
+        <li>选择安装路径（建议选C盘或D盘的简单文件夹，比如C:\Keil，别放中文文件夹）；</li>
+        <li>填写用户信息（随便填，比如Name填“小白”，Company填“学习”）；</li>
+        <li>等待安装完成，最后点击“Finish”；</li>
+        <li>安装补丁（破解软件，避免试用期限制）：打开补丁程序，选择Keil安装路径里的“UV4.exe”，点击“Patch”，提示成功即可。</li>
+    </ol>
+
+    <h3>2. 安装驱动和下载软件：让电脑和单片机“沟通”</h3>
+    <div class="icon-box">
+        <span>🔌</span>
+        <span>沟通工具：驱动+下载软件两步走</span>
+    </div>
+    <ul>
+        <li><strong>驱动软件（CH340驱动）</strong>：电脑识别单片机下载器的“翻译官”🌐（大部分下载器用CH340芯片）；
+            <ol>
+                <li>下载CH340驱动安装包，双击“SETUP.EXE”；</li>
+                <li>点击“安装”，提示“安装成功”后，把下载器插电脑USB口；</li>
+                <li>打开“设备管理器”（右键此电脑→管理→设备管理器），看“端口”里有没有“USB-SERIAL CH340”，有就说明驱动装好了；</li>
+            </ol>
+        </li>
+        <li><strong>下载软件（STC-ISP）</strong>：把Keil生成的程序传到单片机里的“工具”，步骤：
+            <ol>
+                <li>下载STC-ISP软件（官网免费下），打开软件；</li>
+                <li>选择单片机型号（比如“STC89C52RC”，和你用的芯片一致）；</li>
+                <li>加载程序文件：点击“打开程序文件”，选Keil生成的“HEX文件”（Keil编译后会生成，在项目文件夹的“Objects”里）；</li>
+                <li>选择串口：在“串口号”里选设备管理器里看到的“CH340对应的串口”（比如COM3）；</li>
+                <li>下载程序：点击“下载/编程”，然后给单片机上电（先点下载再上电，不然传不了），软件提示“下载成功”就完成了。</li>
+            </ol>
+        </li>
+    </ul>
+
+
+    <!-- 第五部分：实践任务 -->
+    <h2>五、实践任务：单片机应用系统开发流程</h2>
+    <div class="icon-box">
+        <span>📋</span>
+        <span>项目流程：6步完成单片机项目</span>
+    </div>
+    <p>做任何单片机项目（比如流水灯、智能小车），都要按这6步走，像“做项目的步骤清单”：</p>
+    <ol>
+        <li><strong>需求分析</strong>：明确“要实现什么功能”🎯（比如流水灯：4个LED从左到右依次点亮，循环不止，每个LED亮1秒）；</li>
+        <li><strong>方案设计</strong>：确定“用什么硬件和软件”📋（硬件：51单片机+4个LED+4个限流电阻+面包板；软件：C语言写左移流水程序，用Keil编译）；</li>
+        <li><strong>硬件搭建</strong>：按设计搭电路🔧（先搭最小系统，再接LED和电阻，检查接线有没有错——比如LED正负极别接反）；</li>
+        <li><strong>软件编写</strong>：在Keil里写代码💻（按前面的流水灯程序步骤写，写完后点击“编译”，没报错就生成HEX文件）；</li>
+        <li><strong>程序下载</strong>：用STC-ISP把HEX文件传到单片机📤（按调试步骤操作，确保驱动和串口没问题）；</li>
+        <li><strong>系统调试</strong>：测试功能是否正常🔍（如果LED没流水，先查电路——是不是电阻接错、LED正负极反了；再查程序——是不是延时时间太短、左移位数错了，逐一修改，直到实现功能）。</li>
+    </ol>
+    <div class="note">
+        <strong>新手提醒</strong>：新手常犯的错：接线错、程序里引脚定义错、下载时没重新上电，遇到问题别慌，按“先查硬件再查软件”的顺序排查。
+    </div>
+</body>
+</html>
